@@ -37,13 +37,49 @@ export async function submitContactForm(
 
   const { name, email, subject, message } = validatedFields.data;
 
-  console.log("Formulario de Contacto/Pedido Recibido:");
-  console.log("Nombre:", name);
-  console.log("Email:", email);
-  console.log("Asunto:", subject);
-  console.log("Mensaje (Detalles del Pedido):", message); // Message includes currency symbol, which is fine for email/log
-  
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // --- Simulación de envío de correo electrónico ---
+  const emailData = {
+    to: "mikelangel1993@gmail.com",
+    from: "noreply@marivelas.com", // O el email que configures en tu servicio
+    subject: `Nuevo Pedido/Consulta de Marivelas: ${subject}`,
+    htmlBody: `
+      <h1>Nuevo Pedido/Consulta Recibida</h1>
+      <p><strong>Nombre:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Asunto:</strong> ${subject}</p>
+      <hr/>
+      <h2>Detalles del Pedido/Mensaje:</h2>
+      <pre style="white-space: pre-wrap; font-family: monospace;">${message}</pre>
+      <hr/>
+      <p><em>Este es un mensaje automático. Contactar al cliente a través de su email: ${email}</em></p>
+    `,
+  };
+
+  console.log("--- INICIO SIMULACIÓN ENVÍO DE CORREO ---");
+  console.log("Para:", emailData.to);
+  console.log("De:", emailData.from);
+  console.log("Asunto:", emailData.subject);
+  console.log("Cuerpo del correo (HTML):");
+  console.log(emailData.htmlBody);
+  console.log("--- FIN SIMULACIÓN ENVÍO DE CORREO ---");
+  
+  // **NOTA IMPORTANTE:**
+  // La implementación real del envío de correos requiere un servicio externo.
+  // Aquí es donde integrarías un servicio como Resend, SendGrid, Nodemailer, etc.
+  // Por ejemplo, con Resend:
+  // try {
+  //   const { Resend } = await import('resend'); // Asegúrate de instalar 'resend'
+  //   const resend = new Resend(process.env.RESEND_API_KEY);
+  //   await resend.emails.send(emailData);
+  //   console.log("Correo electrónico enviado con éxito (simulado).");
+  // } catch (error) {
+  //   console.error("Error al enviar correo (simulado):", error);
+  //   // Podrías devolver un error específico si el envío falla, pero no afecta el éxito del formulario para el usuario.
+  //   // O manejarlo de forma que no impida que el usuario vea el mensaje de éxito.
+  // }
 
   return {
     message: "¡Tu consulta/pedido ha sido enviado con éxito! Nos pondremos en contacto contigo pronto.",

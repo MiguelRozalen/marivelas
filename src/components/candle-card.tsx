@@ -11,7 +11,7 @@ import { AVAILABLE_CANDLE_COLORS, type CandleColorOption } from '@/config/candle
 import { useState, useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, CheckCircle } from 'lucide-react';
+import { ShoppingCart, CheckCircle } from 'lucide-react'; // CheckCircle still imported but not used below
 
 interface CandleCardProps {
   candle: Candle;
@@ -23,11 +23,11 @@ export default function CandleCard({ candle }: CandleCardProps) {
   const { toast } = useToast();
 
   const handleAddToCart = () => {
-    addToCart(candle, selectedColor); // Quantity removed, handled by context
+    addToCart(candle, selectedColor);
     toast({
       title: "¡Añadido al carrito!",
       description: `${candle.name} (Color: ${selectedColor.name}) ha sido añadido a tu carrito.`,
-      action: <CheckCircle className="h-5 w-5 text-green-500" />,
+      action: <CheckCircle className="h-5 w-5 text-green-500" />, // This CheckCircle is for the toast, not the selector
     });
   };
 
@@ -57,7 +57,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
               const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
               if (color) setSelectedColor(color);
             }}
-            className="flex flex-wrap gap-2"
+            className="flex flex-wrap gap-3" // Increased gap slightly for better spacing of smaller circles
             aria-label={`Opciones de color para ${candle.name}`}
           >
             {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
@@ -73,22 +73,19 @@ export default function CandleCard({ candle }: CandleCardProps) {
                   className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
                              flex items-center justify-center
                              peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
-                             peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1" // Color circles smaller (h-5 w-5)
+                             peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
                   style={{ backgroundColor: colorOpt.hexColor }}
                   title={colorOpt.name}
                 >
-                  {selectedColor.value === colorOpt.value && (
-                     <CheckCircle className={`h-3 w-3 ${colorOpt.value === 'blanco' || colorOpt.hexColor === '#FFFFFF' || colorOpt.hexColor === '#f5e7c4' ? 'text-black' : 'text-white'}`} /> // Check icon smaller
-                  )}
+                  {/* Checkmark icon removed from here */}
                 </Label>
               </div>
             ))}
           </RadioGroup>
         </div>
-        {/* Quantity input removed */}
       </CardContent>
       <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p> {/* Price in Euros, shows unit price */}
+        <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
         <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
           <ShoppingCart className="mr-2 h-5 w-5" />
           Agregar al Carrito
