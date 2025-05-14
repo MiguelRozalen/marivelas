@@ -15,8 +15,8 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center group">
           {/* Logo revertido a la versión anterior: Flame simple */}
-          <Flame className="h-8 w-8 text-primary mr-2 group-hover:text-accent-foreground transition-colors" />
-          <span className="text-2xl font-bold text-primary group-hover:text-accent-foreground transition-colors">
+          <Flame className="h-8 w-8 text-primary mr-2" />
+          <span className="text-2xl text-primary">
             Marivelas
           </span>
         </Link>
