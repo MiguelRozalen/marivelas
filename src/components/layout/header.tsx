@@ -14,11 +14,8 @@ export default function Header() {
     <header className="bg-card shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center group">
-          <div className="p-2 bg-primary rounded-full mr-2 group-hover:shadow-lg transition-shadow flex items-center justify-center">
-            {/* Base is now primary color (brown), flame is primary-foreground (light) */}
-            {/* Flame icon slightly smaller for better proportion with the base, padding increased a bit */}
-            <Flame className="h-6 w-6 text-primary-foreground" />
-          </div>
+          {/* Logo revertido a la versión anterior: Flame simple */}
+          <Flame className="h-8 w-8 text-primary mr-2 group-hover:text-accent-foreground transition-colors" />
           <span className="text-2xl font-bold text-primary group-hover:text-accent-foreground transition-colors">
             Marivelas
           </span>
