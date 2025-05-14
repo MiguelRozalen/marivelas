@@ -15,16 +15,19 @@ export default function Header() {
     <header className="bg-card shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center group">
-          {/* Replace Flame icon and text with Image component */}
           <Image
-            src="/logo.png" // Assumes logo.png is in the public folder
+            src="/logo.svg" // Assumes logo.png is in the public folder
             alt="Marivelas Logo"
-            width={180} // Adjust width as needed
-            height={50} // Adjust height as needed
-            className="h-auto" // Maintain aspect ratio, adjust height via width
+            width={30} // Adjust width as needed
+            height={30} // Adjust height as needed
+            className="h-auto mr-2" // Maintain aspect ratio, adjust height via width
             priority // Load the logo with high priority
           />
+          <span className="text-2xl text-primary font-bold">
+            Marivelas
+          </span>
         </Link>
+
         <nav className="flex items-center space-x-4">
           <Link href="/#catalog" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">
             Catálogo
