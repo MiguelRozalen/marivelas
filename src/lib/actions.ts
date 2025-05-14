@@ -1,8 +1,7 @@
-
+// src/lib/actions.ts
 "use server";
 
 import { contactFormSchema } from "@/lib/schemas";
-import { AVAILABLE_CANDLE_COLORS } from "@/config/candle-options";
 
 export type ContactFormState = {
   message: string;
@@ -12,16 +11,7 @@ export type ContactFormState = {
     email?: string[];
     subject?: string[];
     message?: string[];
-    product?: string[];
-    color?: string[];
   };
-};
-
-// Helper to get color name from value for logging/display
-const getColorNameByValue = (value: string | null | undefined): string => {
-  if (!value) return "";
-  const foundColor = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
-  return foundColor ? foundColor.name : value; // fallback to value if not found
 };
 
 export async function submitContactForm(
@@ -31,53 +21,32 @@ export async function submitContactForm(
   const validatedFields = contactFormSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
-    subject: formData.get("subject"),
+    subject: formData.get("subject") || "Consulta de Pedido", // Default subject if not provided
     message: formData.get("message"),
-    product: formData.get("product"),
-    color: formData.get("color"), // Get color value
   });
 
   if (!validatedFields.success) {
     return {
-      message: "Validation failed. Please check your input.",
+      message: "Error de validación. Por favor, revisa tus datos.",
       status: "error",
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
-  const { name, email, subject: formSubject, message, product, color } = validatedFields.data;
+  const { name, email, subject, message } = validatedFields.data;
 
   // In a real application, you would send an email or save to a database here.
-  // For this example, we'll just log the data.
-  console.log("Contact Form Submission:");
-  console.log("Name:", name);
+  console.log("Formulario de Contacto/Pedido Recibido:");
+  console.log("Nombre:", name);
   console.log("Email:", email);
-  
-  let finalSubject = formSubject;
-  const colorDisplayName = getColorNameByValue(color);
-
-  if (product) {
-    console.log("Inquiring about product:", product);
-    if (color) { // color value
-      console.log("Selected color (value):", color);
-      console.log("Selected color (name):", colorDisplayName);
-    }
-    // Ensure subject reflects product and color if not already set by client
-    if (!finalSubject) {
-      finalSubject = `Consulta sobre ${product}${colorDisplayName ? ` (Color: ${colorDisplayName})` : ""}`;
-    }
-  } else if (!finalSubject) {
-    finalSubject = "Consulta General";
-  }
-  
-  console.log("Subject:", finalSubject);
-  console.log("Message:", message);
+  console.log("Asunto:", subject);
+  console.log("Mensaje (Detalles del Pedido):", message);
   
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   return {
-    message: "¡Tu mensaje ha sido enviado con éxito! Nos pondremos en contacto contigo pronto.",
+    message: "¡Tu consulta/pedido ha sido enviado con éxito! Nos pondremos en contacto contigo pronto.",
     status: "success",
   };
 }

@@ -1,25 +1,45 @@
+// src/components/candle-card.tsx
 "use client";
 
 import Image from 'next/image';
 import type { Candle } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { AVAILABLE_CANDLE_COLORS, type CandleColorOption } from '@/config/candle-options';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { CartContext } from '@/context/cart-context';
+import { useToast } from "@/hooks/use-toast";
+import { ShoppingCart, CheckCircle } from 'lucide-react';
 
 interface CandleCardProps {
   candle: Candle;
 }
 
 export default function CandleCard({ candle }: CandleCardProps) {
-  const [selectedColor, setSelectedColor] = useState<string>(AVAILABLE_CANDLE_COLORS[0]?.value || "");
+  const [selectedColor, setSelectedColor] = useState<CandleColorOption>(AVAILABLE_CANDLE_COLORS[0]);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useContext(CartContext);
+  const { toast } = useToast();
 
-  const inquireLink = selectedColor
-    ? `/#contact?product=${encodeURIComponent(candle.name)}&color=${encodeURIComponent(selectedColor)}`
-    : `/#contact?product=${encodeURIComponent(candle.name)}`;
+  const handleAddToCart = () => {
+    if (quantity < 1) {
+      toast({
+        title: "Cantidad Inválida",
+        description: "Por favor, introduce una cantidad válida.",
+        variant: "destructive",
+      });
+      return;
+    }
+    addToCart(candle, selectedColor, quantity);
+    toast({
+      title: "¡Añadido al carrito!",
+      description: `${candle.name} (Color: ${selectedColor.name}, Cantidad: ${quantity}) ha sido añadido a tu carrito.`,
+      action: <CheckCircle className="h-5 w-5 text-green-500" />,
+    });
+  };
 
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
@@ -42,31 +62,57 @@ export default function CandleCard({ candle }: CandleCardProps) {
         <div className="mt-4">
           <Label className="text-sm font-medium text-muted-foreground mb-2 block">Selecciona un color:</Label>
           <RadioGroup
-            value={selectedColor}
-            onValueChange={setSelectedColor}
-            className="flex flex-wrap gap-x-4 gap-y-2"
-            aria-label={`Color options for ${candle.name}`}
+            value={selectedColor.value}
+            onValueChange={(value) => {
+              const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
+              if (color) setSelectedColor(color);
+            }}
+            className="flex flex-wrap gap-3"
+            aria-label={`Opciones de color para ${candle.name}`}
           >
             {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
-              <div key={colorOpt.value} className="flex items-center space-x-2">
-                <RadioGroupItem value={colorOpt.value} id={`${candle.id}-${colorOpt.value}`} aria-label={colorOpt.name} />
-                <Label htmlFor={`${candle.id}-${colorOpt.value}`} className="flex items-center cursor-pointer text-sm text-card-foreground">
-                  <span 
-                    className="mr-2 h-4 w-4 rounded-full border border-gray-300" 
-                    style={{ backgroundColor: colorOpt.hexColor }}
-                    aria-hidden="true"
-                  ></span>
-                  {colorOpt.name}
+              <div key={colorOpt.value} className="flex items-center">
+                <RadioGroupItem 
+                  value={colorOpt.value} 
+                  id={`${candle.id}-${colorOpt.value}`} 
+                  className="sr-only peer"
+                  aria-label={colorOpt.name}
+                />
+                <Label 
+                  htmlFor={`${candle.id}-${colorOpt.value}`} 
+                  className="h-8 w-8 rounded-full border-2 border-transparent cursor-pointer transition-all
+                             flex items-center justify-center
+                             peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
+                             peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
+                  style={{ backgroundColor: colorOpt.hexColor }}
+                  title={colorOpt.name}
+                >
+                  {selectedColor.value === colorOpt.value && (
+                     <CheckCircle className={`h-5 w-5 ${colorOpt.value === 'blanco' || colorOpt.hexColor === '#FFFFFF' || colorOpt.hexColor === '#f5e7c4' ? 'text-black' : 'text-white'}`} />
+                  )}
                 </Label>
               </div>
             ))}
           </RadioGroup>
         </div>
+
+        <div className="mt-4">
+          <Label htmlFor={`${candle.id}-quantity`} className="text-sm font-medium text-muted-foreground mb-2 block">Cantidad:</Label>
+          <Input
+            id={`${candle.id}-quantity`}
+            type="number"
+            min="1"
+            value={quantity}
+            onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+            className="w-20"
+          />
+        </div>
       </CardContent>
-      <CardFooter className="p-6 pt-0 flex justify-between items-center">
-        <p className="text-2xl font-bold text-accent-foreground" style={{color: "hsl(var(--accent))"}}>${candle.price.toFixed(2)}</p>
-        <Button asChild variant="default">
-          <Link href={inquireLink}>Consultar</Link>
+      <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p className="text-2xl font-bold text-accent-foreground">${candle.price.toFixed(2)}</p>
+        <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
+          <ShoppingCart className="mr-2 h-5 w-5" />
+          Agregar al Carrito
         </Button>
       </CardFooter>
     </Card>

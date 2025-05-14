@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 345 70% 97%; /* Soft Pinkish White #FDEAF2 */
-    --foreground: 25 35% 25%; /* Dark Brown */
+    --background: 25 45% 95%; /* #F5F0ED - Light Pinkish White */
+    --foreground: 19 18% 25%; /* Darker Brown for text, derived from accent */
     --card: 0 0% 100%; /* White #FFFFFF */
-    --card-foreground: 25 35% 25%;
+    --card-foreground: 19 18% 25%;
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 25 35% 25%;
-    --primary: 54 68% 77%; /* Light Gold - #F0E68C */
-    --primary-foreground: 54 50% 30%; /* Darker shade for text on gold */
-    --secondary: 330 65% 93%; /* Soft Pink - #FBE0E8 */
-    --secondary-foreground: 330 40% 35%; /* Darker Pink */
-    --muted: 210 65% 93%; /* Soft Blue - #E0EAFB */
-    --muted-foreground: 210 40% 45%; /* Darker Blue */
-    --accent: 54 68% 77%; /* Light Gold - #F0E68C */
-    --accent-foreground: 54 50% 30%;
+    --popover-foreground: 19 18% 25%;
+    --primary: 19 18% 55%; /* #9C7C6F - Brown */
+    --primary-foreground: 25 30% 98%; /* Light color for text on primary */
+    --secondary: 25 30% 90%; /* Lighter shade of background for subtle contrast #EDE6E3 */
+    --secondary-foreground: 19 18% 35%; /* Slightly darker brown for text on secondary */
+    --muted: 25 25% 85%; /* Muted pinkish tone #E8DFDA */
+    --muted-foreground: 19 15% 45%; /* Muted brown text */
+    --accent: 19 18% 55%; /* #9C7C6F - Brown (same as primary) */
+    --accent-foreground: 25 30% 98%; /* Light color for text on accent */
     --destructive: 0 70% 65%;
     --destructive-foreground: 0 0% 100%;
-    --border: 30 20% 80%;
-    --input: 30 25% 90%;
-    --ring: 54 68% 67%; /* Darker Gold for focus */
+    --border: 25 20% 80%; /* Lighter border #DCD3CF */
+    --input: 25 30% 88%; /* Input background #EBE2DE */
+    --ring: 19 18% 45%; /* Darker Brown for focus ring */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -31,25 +31,25 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 30 10% 15%; /* Dark Brownish */
-    --foreground: 30 20% 85%; /* Light Beige */
-    --card: 30 10% 20%;
-    --card-foreground: 30 20% 85%;
-    --popover: 30 10% 10%;
-    --popover-foreground: 30 20% 85%;
-    --primary: 54 60% 65%; /* Muted Gold */
-    --primary-foreground: 54 20% 15%;
-    --secondary: 330 40% 30%; /* Dark Muted Pink */
-    --secondary-foreground: 330 30% 75%;
-    --muted: 210 40% 25%; /* Dark Muted Blue */
-    --muted-foreground: 210 30% 70%;
-    --accent: 54 60% 65%; /* Muted Gold */
-    --accent-foreground: 54 20% 15%;
-    --destructive: 0 62.8% 30.6%; /* Default dark destructive */
-    --destructive-foreground: 0 0% 98%; /* Default dark destructive foreground */
-    --border: 30 10% 25%;
-    --input: 30 10% 25%;
-    --ring: 54 50% 55%; /* Muted Gold for focus */
+    --background: 19 15% 15%; /* Dark Brownish */
+    --foreground: 25 30% 85%; /* Light Beige */
+    --card: 19 15% 20%;
+    --card-foreground: 25 30% 85%;
+    --popover: 19 10% 10%;
+    --popover-foreground: 25 30% 85%;
+    --primary: 19 25% 65%; /* Muted Brown for dark mode */
+    --primary-foreground: 19 15% 15%;
+    --secondary: 25 20% 30%; /* Dark Muted Pinkish */
+    --secondary-foreground: 25 30% 75%;
+    --muted: 25 15% 25%; /* Dark Muted Pinkish */
+    --muted-foreground: 25 30% 70%;
+    --accent: 19 25% 65%; /* Muted Brown for dark mode */
+    --accent-foreground: 19 15% 15%;
+    --destructive: 0 62.8% 30.6%; 
+    --destructive-foreground: 0 0% 98%; 
+    --border: 19 15% 25%;
+    --input: 19 15% 25%;
+    --ring: 19 25% 55%; /* Muted Brown for focus ring */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -64,6 +64,5 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Removed font-family: Arial, Helvetica, sans-serif; to use Next/Font */
   }
 }
