@@ -1,8 +1,7 @@
 // src/components/contact-form.tsx
 "use client";
 
-import { useEffect, useRef, useActionState } from "react";
-import { useFormStatus } from "react-dom"; 
+import { useEffect, useRef, useActionState, useTransition } from "react"; // Updated imports
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -22,11 +21,11 @@ const initialState: ContactFormState = {
   status: "idle",
 };
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+// SubmitButton now takes isPending as a prop
+function SubmitButton({ isPending }: { isPending: boolean }) {
   return (
-    <Button type="submit" disabled={pending} className="w-full sm:w-auto">
-      {pending ? "Enviando..." : "Enviar Consulta"}
+    <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+      {isPending ? "Enviando..." : "Enviar Consulta"}
     </Button>
   );
 }
@@ -37,7 +36,9 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ orderSummary, onFormSubmitSuccess }: ContactFormProps) {
-  const [state, formAction] = useActionState(submitContactForm, initialState);
+  // useActionState now returns [state, formAction, isActionPending]
+  const [state, formAction, isActionPending] = useActionState(submitContactForm, initialState);
+  const [, startTransition] = useTransition(); // We only need startTransition from useTransition
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -99,8 +100,10 @@ export default function ContactForm({ orderSummary, onFormSubmitSuccess }: Conta
         formData.append(key, String(value));
       }
     });
-    // Directly call formAction which is already bound to submitContactForm
-    (formAction as (payload: FormData) => void)(formData);
+    // Wrap the call to formAction in startTransition
+    startTransition(() => {
+      (formAction as (payload: FormData) => void)(formData);
+    });
   };
 
 
@@ -150,7 +153,8 @@ export default function ContactForm({ orderSummary, onFormSubmitSuccess }: Conta
             {getFieldError("message") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("message")}</p>}
           </div>
           
-          <SubmitButton />
+          {/* Pass isActionPending to SubmitButton */}
+          <SubmitButton isPending={isActionPending} />
         </form>
       </CardContent>
     </Card>
