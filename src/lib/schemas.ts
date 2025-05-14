@@ -7,4 +7,5 @@ export const contactFormSchema = z.object({
   subject: z.string().optional(),
   message: z.string().min(10, { message: "Message must be at least 10 characters." }),
   product: z.string().optional(), // Hidden field for product inquiries
+  color: z.string().optional(), // Hidden field for selected color
 });

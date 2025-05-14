@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useRef, useActionState } from "react";
-// useFormStatus is still needed for the SubmitButton
 import { useFormStatus } from "react-dom"; 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { submitContactForm, type ContactFormState } from "@/lib/actions";
 import { contactFormSchema } from "@/lib/schemas";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AVAILABLE_CANDLE_COLORS } from "@/config/candle-options";
+
 
 const initialState: ContactFormState = {
   message: "",
@@ -28,7 +29,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full sm:w-auto">
-      {pending ? "Sending..." : "Send Message"}
+      {pending ? "Enviando..." : "Enviar Mensaje"}
     </Button>
   );
 }
@@ -38,8 +39,17 @@ export default function ContactForm() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const productInquiry = searchParams.get("product");
-
+  const colorInquiryParams = searchParams.get("color");
+  
   const formRef = useRef<HTMLFormElement>(null);
+
+  const getColorNameByValue = (value: string | null) => {
+    if (!value) return "";
+    const foundColor = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
+    return foundColor ? foundColor.name : value;
+  }
+  const colorInquiry = getColorNameByValue(colorInquiryParams);
+
 
   const {
     register,
@@ -52,30 +62,46 @@ export default function ContactForm() {
     defaultValues: {
       name: "",
       email: "",
-      subject: productInquiry ? `Inquiry about ${productInquiry}` : "",
+      subject: productInquiry 
+        ? `Consulta sobre ${productInquiry}${colorInquiry ? ` (Color: ${colorInquiry})` : ""}` 
+        : "",
       message: "",
       product: productInquiry || "",
+      color: colorInquiryParams || "", // Store the value, not the display name
     },
   });
 
   useEffect(() => {
-    if (productInquiry) {
-      setValue("subject", `Inquiry about ${productInquiry}`);
-      setValue("product", productInquiry);
+    const currentProduct = searchParams.get("product");
+    const currentColorParam = searchParams.get("color");
+    const currentColorName = getColorNameByValue(currentColorParam);
+
+    if (currentProduct) {
+      setValue("subject", `Consulta sobre ${currentProduct}${currentColorName ? ` (Color: ${currentColorName})` : ""}`);
+      setValue("product", currentProduct);
+    } else {
+       setValue("subject", "");
+       setValue("product", "");
     }
-  }, [productInquiry, setValue]);
+    if (currentColorParam) {
+        setValue("color", currentColorParam);
+    } else {
+        setValue("color", "");
+    }
+  }, [searchParams, setValue]);
   
   useEffect(() => {
     if (state.status === "success") {
       toast({
-        title: "Success!",
+        title: "¡Éxito!",
         description: state.message,
         variant: "default",
-        // Adding an icon for success
         action: <CheckCircle2 className="h-5 w-5 text-green-500" />, 
       });
-      reset(); // Reset form fields on successful submission
-      formRef.current?.reset(); // Also reset the native form element
+      reset(); 
+      formRef.current?.reset(); 
+      // Clear search params from URL manually if desired, or navigate
+      // window.history.replaceState({}, '', window.location.pathname + '#contact');
     } else if (state.status === "error" && state.message) {
       toast({
         title: "Error",
@@ -85,46 +111,46 @@ export default function ContactForm() {
     }
   }, [state, toast, reset]);
 
-  // For errors from useFormState (server-side validation)
   const getFieldError = (fieldName: keyof z.infer<typeof contactFormSchema>) => {
     return state.errors?.[fieldName]?.[0] || errors[fieldName]?.message;
   };
 
   return (
-    <Card className="max-w-2xl mx-auto shadow-lg">
+    <Card className="max-w-2xl mx-auto shadow-lg bg-card">
       <CardHeader>
-        <CardTitle className="text-2xl">Get in Touch</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl text-card-foreground">Ponte en Contacto</CardTitle>
+        <CardDescription className="text-muted-foreground">
           {productInquiry 
-            ? `Have a question about ${productInquiry}? Fill out the form below.`
-            : "We'd love to hear from you. Send us a message!"}
+            ? `¿Tienes alguna pregunta sobre ${productInquiry}${colorInquiry ? ` (Color: ${colorInquiry})` : ''}? Completa el formulario.`
+            : "Nos encantaría saber de ti. ¡Envíanos un mensaje!"}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={formAction} className="space-y-6">
           {productInquiry && <input type="hidden" {...register("product")} />}
+          {colorInquiryParams && <input type="hidden" {...register("color")} />}
           
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" placeholder="Your Name" {...register("name")} aria-invalid={!!getFieldError("name")} />
+            <Label htmlFor="name" className="text-card-foreground">Nombre Completo</Label>
+            <Input id="name" placeholder="Tu Nombre" {...register("name")} aria-invalid={!!getFieldError("name")} />
             {getFieldError("name") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("name")}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input id="email" type="email" placeholder="your@email.com" {...register("email")} aria-invalid={!!getFieldError("email")} />
+            <Label htmlFor="email" className="text-card-foreground">Correo Electrónico</Label>
+            <Input id="email" type="email" placeholder="tu@email.com" {...register("email")} aria-invalid={!!getFieldError("email")} />
             {getFieldError("email") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("email")}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
-            <Input id="subject" placeholder="Question about..." {...register("subject")} aria-invalid={!!getFieldError("subject")} />
+            <Label htmlFor="subject" className="text-card-foreground">Asunto</Label>
+            <Input id="subject" placeholder="Pregunta sobre..." {...register("subject")} aria-invalid={!!getFieldError("subject")} />
             {getFieldError("subject") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("subject")}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
-            <Textarea id="message" placeholder="Your message here..." rows={5} {...register("message")} aria-invalid={!!getFieldError("message")} />
+            <Label htmlFor="message" className="text-card-foreground">Mensaje</Label>
+            <Textarea id="message" placeholder="Tu mensaje aquí..." rows={5} {...register("message")} aria-invalid={!!getFieldError("message")} />
             {getFieldError("message") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("message")}</p>}
           </div>
           
