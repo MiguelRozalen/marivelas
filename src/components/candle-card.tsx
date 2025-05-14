@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { AVAILABLE_CANDLE_COLORS, type CandleColorOption } from '@/config/candle-options';
-import { useState, useContext } from 'react';
+import { useState, useContext, useMemo } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, CheckCircle } from 'lucide-react';
@@ -41,8 +41,12 @@ export default function CandleCard({ candle }: CandleCardProps) {
     });
   };
 
+  const totalPriceForItem = useMemo(() => {
+    return (candle.price * quantity);
+  }, [candle.price, quantity]);
+
   return (
-    <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
+    <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
       <CardHeader className="p-0">
         <div className="aspect-[4/3] relative w-full">
           <Image
@@ -67,7 +71,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
               const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
               if (color) setSelectedColor(color);
             }}
-            className="flex flex-wrap gap-3"
+            className="flex flex-wrap gap-2" // Reduced gap for smaller items
             aria-label={`Opciones de color para ${candle.name}`}
           >
             {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
@@ -80,7 +84,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
                 />
                 <Label 
                   htmlFor={`${candle.id}-${colorOpt.value}`} 
-                  className="h-8 w-8 rounded-full border-2 border-transparent cursor-pointer transition-all
+                  className="h-6 w-6 rounded-full border-2 border-transparent cursor-pointer transition-all
                              flex items-center justify-center
                              peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
                              peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
@@ -88,7 +92,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
                   title={colorOpt.name}
                 >
                   {selectedColor.value === colorOpt.value && (
-                     <CheckCircle className={`h-5 w-5 ${colorOpt.value === 'blanco' || colorOpt.hexColor === '#FFFFFF' || colorOpt.hexColor === '#f5e7c4' ? 'text-black' : 'text-white'}`} />
+                     <CheckCircle className={`h-4 w-4 ${colorOpt.value === 'blanco' || colorOpt.hexColor === '#FFFFFF' || colorOpt.hexColor === '#f5e7c4' ? 'text-black' : 'text-white'}`} />
                   )}
                 </Label>
               </div>
@@ -103,13 +107,16 @@ export default function CandleCard({ candle }: CandleCardProps) {
             type="number"
             min="1"
             value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              setQuantity(val >= 1 ? val : 1);
+            }}
             className="w-20"
           />
         </div>
       </CardContent>
       <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-2xl font-bold text-accent-foreground">${candle.price.toFixed(2)}</p>
+        <p className="text-2xl font-bold text-primary">${totalPriceForItem.toFixed(2)}</p>
         <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
           <ShoppingCart className="mr-2 h-5 w-5" />
           Agregar al Carrito
@@ -118,3 +125,19 @@ export default function CandleCard({ candle }: CandleCardProps) {
     </Card>
   );
 }
+
+// Simple fade-in animation for tailwind.config.js if needed
+// keyframes: {
+//   fadeIn: {
+//     '0%': { opacity: '0' },
+//     '100%': { opacity: '1' },
+//   },
+// },
+// animation: {
+//   fadeIn: 'fadeIn 0.5s ease-out forwards',
+// },
+// Add 'animate-fadeIn' to the Card's className.
+// For now, using a transition on opacity when items are added to the list in candle-list.tsx
+// The `animate-fadeIn` class here is a placeholder for a potential global animation.
+// Tailwind's `animate-in` with `fade-in` from `tailwindcss-animate` might cover this by default on new elements.
+// The card already has `transition-shadow`. We can rely on list transitions for load-in.
