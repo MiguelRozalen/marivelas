@@ -1,8 +1,9 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useRef, useActionState } from "react";
+// useFormStatus is still needed for the SubmitButton
+import { useFormStatus } from "react-dom"; 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -15,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { submitContactForm, type ContactFormState } from "@/lib/actions";
-import { contactFormSchema } from "@/lib/schemas"; // Updated import
+import { contactFormSchema } from "@/lib/schemas";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const initialState: ContactFormState = {
@@ -33,7 +34,7 @@ function SubmitButton() {
 }
 
 export default function ContactForm() {
-  const [state, formAction] = useFormState(submitContactForm, initialState);
+  const [state, formAction] = useActionState(submitContactForm, initialState);
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const productInquiry = searchParams.get("product");
@@ -70,6 +71,8 @@ export default function ContactForm() {
         title: "Success!",
         description: state.message,
         variant: "default",
+        // Adding an icon for success
+        action: <CheckCircle2 className="h-5 w-5 text-green-500" />, 
       });
       reset(); // Reset form fields on successful submission
       formRef.current?.reset(); // Also reset the native form element
