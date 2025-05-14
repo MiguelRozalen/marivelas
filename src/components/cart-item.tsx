@@ -35,7 +35,7 @@ export default function CartItem({ item }: CartItemProps) {
           />
         </div>
         <div className="flex-grow">
-          <Link href={`/#catalog`} passHref> {/* Ideally link to product page if exists */}
+          <Link href={`/#catalog`} passHref> 
             <h3 className="text-lg font-semibold text-card-foreground hover:text-primary">{item.candle.name}</h3>
           </Link>
           <div className="flex items-center my-1">
@@ -47,7 +47,7 @@ export default function CartItem({ item }: CartItemProps) {
             ></span>
             <span className="ml-2 text-sm text-muted-foreground">{item.color.name}</span>
           </div>
-          <p className="text-sm text-muted-foreground">Precio unitario: ${item.candle.price.toFixed(2)}</p>
+          <p className="text-sm text-muted-foreground">Precio unitario: €{item.candle.price.toFixed(2)}</p> {/* Currency updated to € */}
         </div>
       </div>
 
@@ -59,7 +59,12 @@ export default function CartItem({ item }: CartItemProps) {
           <Input
             type="number"
             value={item.quantity}
-            onChange={(e) => handleQuantityChange(parseInt(e.target.value, 10))}
+            onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val)) {
+                    handleQuantityChange(val);
+                }
+            }}
             min="1"
             className="w-16 text-center"
             aria-label={`Cantidad para ${item.candle.name}`}
@@ -69,8 +74,8 @@ export default function CartItem({ item }: CartItemProps) {
           </Button>
         </div>
 
-        <p className="text-lg font-semibold text-accent-foreground w-24 text-center sm:text-right">
-          ${(item.candle.price * item.quantity).toFixed(2)}
+        <p className="text-lg font-semibold text-primary w-24 text-center sm:text-right"> {/* text-primary for brown color */}
+          €{(item.candle.price * item.quantity).toFixed(2)} {/* Currency updated to € */}
         </p>
 
         <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="text-destructive hover:text-destructive/80" aria-label="Eliminar del carrito">

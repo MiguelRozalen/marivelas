@@ -2,7 +2,7 @@
 "use server";
 
 import { contactFormSchema } from "@/lib/schemas";
-import type { Candle } from "@/types"; // Assuming Candle type is defined in types
+import type { Candle } from "@/types"; 
 import { PAGE_SIZE } from "@/config/pagination";
 
 export type ContactFormState = {
@@ -23,7 +23,7 @@ export async function submitContactForm(
   const validatedFields = contactFormSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
-    subject: formData.get("subject") || "Consulta de Pedido", // Default subject if not provided
+    subject: formData.get("subject") || "Consulta de Pedido", 
     message: formData.get("message"),
   });
 
@@ -37,14 +37,12 @@ export async function submitContactForm(
 
   const { name, email, subject, message } = validatedFields.data;
 
-  // In a real application, you would send an email or save to a database here.
   console.log("Formulario de Contacto/Pedido Recibido:");
   console.log("Nombre:", name);
   console.log("Email:", email);
   console.log("Asunto:", subject);
-  console.log("Mensaje (Detalles del Pedido):", message);
+  console.log("Mensaje (Detalles del Pedido):", message); // Message includes currency symbol, which is fine for email/log
   
-  // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   return {
@@ -53,7 +51,6 @@ export async function submitContactForm(
   };
 }
 
-// Mock data for infinite scroll
 const ALL_CANDLES_DATA: Candle[] = [
   { id: '1', name: 'Sueño de Vainilla', price: 15.99, imageUrl: 'https://placehold.co/600x400.png', dataAiHint: 'vanilla candle', description: 'Una relajante mezcla de rica vainilla y crema dulce.' },
   { id: '2', name: 'Campos de Lavanda', price: 18.50, imageUrl: 'https://placehold.co/600x400.png', dataAiHint: 'lavender fields', description: 'Lavanda calmante para relajar tus sentidos.' },
@@ -76,7 +73,6 @@ const ALL_CANDLES_DATA: Candle[] = [
 ];
 
 export async function fetchCandles(currentOffset: number): Promise<Candle[]> {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000)); 
   
   const newCandles = ALL_CANDLES_DATA.slice(currentOffset, currentOffset + PAGE_SIZE);
@@ -84,7 +80,6 @@ export async function fetchCandles(currentOffset: number): Promise<Candle[]> {
 }
 
 export async function getTotalCandlesCount(): Promise<number> {
-  // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 100));
   return ALL_CANDLES_DATA.length;
 }

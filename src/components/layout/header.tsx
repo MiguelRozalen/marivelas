@@ -1,7 +1,7 @@
 // src/components/layout/header.tsx
 "use client";
 import Link from 'next/link';
-import { FlameKindling, ShoppingCart } from 'lucide-react';
+import { Flame, ShoppingCart } from 'lucide-react'; // Changed Candle to Flame
 import { useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { Badge } from '@/components/ui/badge';
@@ -14,8 +14,8 @@ export default function Header() {
     <header className="bg-card shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-primary-foreground hover:text-accent-foreground transition-colors flex items-center">
-          <FlameKindling className="h-8 w-8 mr-2 text-primary" />
-          Marivelas Catálogo
+          <Flame className="h-8 w-8 mr-2 text-primary" /> {/* Changed Icon to Flame */}
+          Marivelas
         </Link>
         <nav className="flex items-center space-x-4">
           <Link href="/#catalog" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">

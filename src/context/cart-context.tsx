@@ -7,7 +7,7 @@ import React, { createContext, useState, ReactNode, useEffect } from 'react';
 
 interface CartContextType {
   cartItems: CartItemType[];
-  addToCart: (candle: Candle, color: CandleColorOption, quantity: number) => void;
+  addToCart: (candle: Candle, color: CandleColorOption) => void; // Quantity removed from signature
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -44,18 +44,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, [cartItems]);
 
-  const addToCart = (candle: Candle, color: CandleColorOption, quantity: number) => {
+  // Updated addToCart logic: if item exists, increment quantity, else add with quantity 1
+  const addToCart = (candle: Candle, color: CandleColorOption) => {
     setCartItems(prevItems => {
       const itemId = `${candle.id}-${color.value}`;
       const existingItem = prevItems.find(item => item.id === itemId);
       if (existingItem) {
         return prevItems.map(item =>
           item.id === itemId
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + 1 } // Increment quantity
             : item
         );
       }
-      return [...prevItems, { id: itemId, candle, color, quantity }];
+      return [...prevItems, { id: itemId, candle, color, quantity: 1 }]; // Add new item with quantity 1
     });
   };
 

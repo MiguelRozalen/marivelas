@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Marivelas Catálogo',
+  title: 'Marivelas', // Updated title
   description: 'Velas artesanales por Marivelas',
 };
 

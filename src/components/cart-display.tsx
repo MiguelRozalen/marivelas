@@ -21,9 +21,9 @@ export default function CartDisplay() {
     if (cartItems.length === 0) return "";
     let summary = "Resumen del Pedido:\n\n";
     cartItems.forEach(item => {
-      summary += `- ${item.candle.name} (Color: ${item.color.name}) x ${item.quantity} - $${(item.candle.price * item.quantity).toFixed(2)}\n`;
+      summary += `- ${item.candle.name} (Color: ${item.color.name}) x ${item.quantity} - €${(item.candle.price * item.quantity).toFixed(2)}\n`;
     });
-    summary += `\nTotal: $${totalPrice.toFixed(2)}`;
+    summary += `\nTotal: €${totalPrice.toFixed(2)}`; // Currency updated to €
     return summary;
   }, [cartItems, totalPrice]);
 
@@ -34,7 +34,6 @@ export default function CartDisplay() {
   const handleFormSubmitSuccess = () => {
     clearCart();
     setShowContactForm(false); 
-    // Optionally navigate to a success page or show a global success message
   };
 
   if (cartItems.length === 0 && !showContactForm) {
@@ -57,14 +56,16 @@ export default function CartDisplay() {
             <CartItem key={item.id} item={item} />
           ))}
           <Separator className="my-6" />
-          <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow">
-            <Button variant="outline" onClick={clearCart} disabled={cartItems.length === 0} className="mb-4 sm:mb-0">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Vaciar Carrito ({totalItems} {totalItems === 1 ? 'artículo' : 'artículos'})
-            </Button>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-foreground">Total: ${totalPrice.toFixed(2)}</p>
-              <Button onClick={handleCheckout} size="lg" className="mt-2 w-full sm:w-auto" disabled={cartItems.length === 0}>
+          <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow gap-4">
+            <div className="w-full sm:w-auto">
+              <Button variant="outline" onClick={clearCart} disabled={cartItems.length === 0} className="w-full sm:w-auto">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Vaciar Carrito ({totalItems} {totalItems === 1 ? 'artículo' : 'artículos'})
+              </Button>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto sm:ml-auto">
+              <p className="text-2xl font-bold text-primary">Total: €{totalPrice.toFixed(2)}</p> {/* Currency updated to €, color changed to primary */}
+              <Button onClick={handleCheckout} size="lg" className="w-full sm:w-auto" disabled={cartItems.length === 0}>
                 Realizar Pedido
               </Button>
             </div>
@@ -74,7 +75,7 @@ export default function CartDisplay() {
 
       {showContactForm && (
         <div className="mt-12">
-           <h2 className="text-2xl font-bold text-center mb-6 text-foreground">Finalizar Pedido</h2>
+           {/* Removed title: <h2 className="text-2xl font-bold text-center mb-6 text-foreground">Finalizar Pedido</h2> */}
           <ContactForm 
             orderSummary={orderSummary} 
             onFormSubmitSuccess={handleFormSubmitSuccess}
