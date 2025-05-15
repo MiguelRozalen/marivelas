@@ -2,7 +2,7 @@
 // src/components/cart-display.tsx
 "use client";
 
-import { useContext, useState, useMemo } from 'react';
+import { useContext, useState, useMemo, useRef } from 'react'; // Added useRef
 import { CartContext } from '@/context/cart-context';
 import CartItem from './cart-item';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ export default function CartDisplay() {
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [isSummaryPopupOpen, setIsSummaryPopupOpen] = useState(false);
   const [isClearCartConfirmPopupOpen, setIsClearCartConfirmPopupOpen] = useState(false);
+  const proceedingToNextStepRef = useRef(false);
 
 
   const totalItems = getItemCount();
@@ -80,11 +81,13 @@ export default function CartDisplay() {
   const handleProceedToCheckout = () => {
     const newOrderId = `MV-${Date.now()}`;
     setCurrentOrderId(newOrderId);
+    proceedingToNextStepRef.current = false; // Reset flag when initiating
     setIsSummaryPopupOpen(true);
   };
 
   const handleInstructionsAcknowledged = () => {
-    setIsSummaryPopupOpen(false);
+    proceedingToNextStepRef.current = true; // Indicate we are proceeding
+    setIsSummaryPopupOpen(false); // Close the first popup
     setIsClearCartConfirmPopupOpen(true); // Open the second confirmation popup
   };
 
@@ -110,9 +113,15 @@ export default function CartDisplay() {
 
   const handleCancelClearCart = () => {
     setIsClearCartConfirmPopupOpen(false);
-    // setCurrentOrderId(null); // Optionally reset orderId if user cancels second popup. Keeping it for now.
+    // currentOrderId remains, so if they re-trigger "Realizar Pedido", a new one is made.
+    // Or if they hit "Entendido" on the first popup again, it will use the existing one.
+    // To ensure a fresh ID if they re-enter flow, we can nullify here too, but let's keep it for now.
+    // For safety, and consistency with handleCancelSummaryPopup, let's nullify it.
+    // setCurrentOrderId(null); // User can re-initiate with a fresh ID if they choose to.
   }
   
+  // This function is called when the first popup is explicitly cancelled via its "Cancelar" button
+  // or when onOpenChange determines it was closed via ESC/overlay
   const handleCancelSummaryPopup = () => {
     setIsSummaryPopupOpen(false);
     setCurrentOrderId(null);
@@ -196,7 +205,27 @@ export default function CartDisplay() {
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto sm:ml-auto">
           <p className="text-2xl font-bold text-primary">Total: €{totalPriceValue.toFixed(2)}</p>
           
-          <AlertDialog open={isSummaryPopupOpen} onOpenChange={(open) => { if (!open) handleCancelSummaryPopup(); else setIsSummaryPopupOpen(open);}}>
+          <AlertDialog
+            open={isSummaryPopupOpen}
+            onOpenChange={(openState) => {
+              setIsSummaryPopupOpen(openState); // Keep UI in sync with dialog's own state changes (e.g. ESC)
+              if (!openState) { // Dialog is closing
+                if (proceedingToNextStepRef.current) {
+                  // Dialog closed because "Entendido, Continuar" was clicked.
+                  // Reset ref, currentOrderId remains for the next dialog.
+                  proceedingToNextStepRef.current = false;
+                } else {
+                  // Dialog closed by "Cancelar" button (which calls handleCancelSummaryPopup) or ESC/overlay.
+                  // Ensure currentOrderId is nulled if not proceeding.
+                  // handleCancelSummaryPopup already sets currentOrderId to null.
+                  // This covers ESC/overlay.
+                  if (currentOrderId !== null) { // Only nullify if it was set
+                     setCurrentOrderId(null);
+                  }
+                }
+              }
+            }}
+          >
             <AlertDialogTrigger asChild>
               <Button onClick={handleProceedToCheckout} size="lg" className="w-full sm:w-auto" disabled={cartItems.length === 0}>
                 Realizar Pedido
