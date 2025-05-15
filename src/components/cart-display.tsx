@@ -2,7 +2,7 @@
 // src/components/cart-display.tsx
 "use client";
 
-import { useContext, useState, useMemo, useRef } from 'react'; // Added useRef
+import { useContext, useState, useMemo, useRef } from 'react';
 import { CartContext } from '@/context/cart-context';
 import CartItem from './cart-item';
 import { Button } from '@/components/ui/button';
@@ -18,13 +18,13 @@ import { STANDARD_PACKAGING_COST, PREMIUM_PACKAGING_COST_PER_ITEM, SHIPPING_COST
 import { useToast } from "@/hooks/use-toast";
 
 export default function CartDisplay() {
-  const { 
-    cartItems, 
+  const {
+    cartItems,
     getSubtotal,
     getPackagingCost,
     getShippingCost,
     getTotalPrice,
-    clearCart, 
+    clearCart,
     getItemCount,
     packagingOption,
     updatePackagingOption
@@ -43,30 +43,10 @@ export default function CartDisplay() {
   const shippingCostValue = getShippingCost();
   const totalPriceValue = getTotalPrice;
 
-  const generateOrderSummary = (orderId: string | null, includeInstructions: boolean = false) => {
+  const generateOrderEmailBody = (orderId: string | null) => {
     if (cartItems.length === 0 && !orderId) return "";
-    
-    let summary = "";
 
-    if (includeInstructions && orderId) {
-      summary += `--- ¡IMPORTANTE! Instrucciones para Finalizar tu Pedido ---\n\n`;
-      summary += `ID de Pedido: ${orderId}\n\n`;
-      summary += `Para finalizar tu compra, por favor, sigue estos pasos:\n`;
-      summary += `1. Envía un correo electrónico a: ${SELLER_EMAIL}\n`;
-      summary += `   - Asunto del correo: Nuevo Pedido - ID: ${orderId} (¡Copia y pega esto!)\n`;
-      summary += `   - Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo, incluyendo tus datos de contacto si lo deseas.\n`;
-      summary += `\n2. Pago:\n`;
-      summary += `   - Realiza el pago del TOTAL DEL PEDIDO (€${totalPriceValue.toFixed(2)}) por Bizum al número que te facilitaremos por correo electrónico tras recibir tu email de pedido.\n`;
-      summary += `   - Importante: Indica el ID del Pedido (${orderId}) en el concepto del Bizum.\n`;
-      summary += `\n3. Confirmación:\n`;
-      summary += `   - Tu pedido comenzará a elaborarse una vez recibido tanto el correo electrónico como la confirmación del pago.\n`;
-      summary += `\n¡Gracias por tu compra en Marivelas!\n`;
-      summary += `-------------------------------------\n`;
-      summary += `RESUMEN DE TU PEDIDO (para copiar en el email):\n`;
-      summary += `-------------------------------------\n\n`;
-    }
-    
-    summary += `Asunto: Nuevo Pedido - ID: ${orderId}\n\n`; // Keep this for the "summary" part
+    let summary = `Asunto: Nuevo Pedido - ID: ${orderId}\n\n`;
     summary += `Estimado equipo de Marivelas,\n\n`;
     summary += `Quisiera realizar el siguiente pedido:\n\n`;
 
@@ -80,27 +60,25 @@ export default function CartDisplay() {
     summary += `-------------------------------------\n`;
     summary += `TOTAL DEL PEDIDO: €${totalPriceValue.toFixed(2)}\n`;
     summary += `-------------------------------------\n\n`;
-    
-    if (includeInstructions && orderId) {
-        summary += `Mis datos de contacto son:\n`;
-        summary += `[Por favor, completa aquí tu Nombre, Email y Teléfono si es necesario]\n`;
-    }
+    summary += `Mis datos de contacto son:\n`;
+    summary += `[Por favor, completa aquí tu Nombre, Email y Teléfono si es necesario]\n`;
+
     return summary;
   };
-  
-  const orderSummaryForPopup = useMemo(() => currentOrderId ? generateOrderSummary(currentOrderId, true) : "", [cartItems, totalPriceValue, currentOrderId, packagingOption, subtotalValue, packagingCostValue, shippingCostValue]);
+
+  const orderEmailBodyForPopup = useMemo(() => currentOrderId ? generateOrderEmailBody(currentOrderId) : "", [cartItems, totalPriceValue, currentOrderId, packagingOption, subtotalValue, packagingCostValue, shippingCostValue]);
 
   const handleProceedToCheckout = () => {
     const newOrderId = `MV-${Date.now()}`;
     setCurrentOrderId(newOrderId);
-    proceedingToNextStepRef.current = false; // Reset flag when initiating
+    proceedingToNextStepRef.current = false;
     setIsSummaryPopupOpen(true);
   };
 
   const handleInstructionsAcknowledged = () => {
-    proceedingToNextStepRef.current = true; // Indicate we are proceeding
-    setIsSummaryPopupOpen(false); // Close the first popup
-    setIsClearCartConfirmPopupOpen(true); // Open the second confirmation popup
+    proceedingToNextStepRef.current = true;
+    setIsSummaryPopupOpen(false);
+    setIsClearCartConfirmPopupOpen(true);
   };
 
   const handleConfirmClearCartAndFinalize = () => {
@@ -116,7 +94,7 @@ export default function CartDisplay() {
           </div>
         ),
         action: <CheckCircle className="h-5 w-5 text-green-500" />,
-        duration: 15000, 
+        duration: 15000,
       });
     }
     setIsClearCartConfirmPopupOpen(false);
@@ -125,8 +103,13 @@ export default function CartDisplay() {
 
   const handleCancelClearCart = () => {
     setIsClearCartConfirmPopupOpen(false);
+    // If canceling the final confirmation, and an orderId was set (meaning they came from the instructions popup),
+    // nullify the orderId so a new one is generated if they try to checkout again.
+    if (currentOrderId) {
+        setCurrentOrderId(null);
+    }
   }
-  
+
   const handleCancelSummaryPopup = () => {
     setIsSummaryPopupOpen(false);
     setCurrentOrderId(null);
@@ -185,7 +168,7 @@ export default function CartDisplay() {
           </RadioGroup>
         </CardContent>
       </Card>
-      
+
       <Card className="mb-6 shadow-md">
          <CardHeader>
             <CardTitle className="text-xl">Resumen de Costes</CardTitle>
@@ -209,7 +192,7 @@ export default function CartDisplay() {
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto sm:ml-auto">
           <p className="text-2xl font-bold text-primary">Total: €{totalPriceValue.toFixed(2)}</p>
-          
+
           <AlertDialog
             open={isSummaryPopupOpen}
             onOpenChange={(openState) => {
@@ -218,7 +201,7 @@ export default function CartDisplay() {
                 if (proceedingToNextStepRef.current) {
                   proceedingToNextStepRef.current = false;
                 } else {
-                  if (currentOrderId !== null) { 
+                  if (currentOrderId !== null) {
                      setCurrentOrderId(null);
                   }
                 }
@@ -233,12 +216,36 @@ export default function CartDisplay() {
             <AlertDialogContent className="max-w-2xl">
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirmación e Instrucciones del Pedido</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {/* Removed ID from here as it's now part of instructions */}
-                </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="max-h-[60vh] overflow-y-auto py-4">
-                <pre className="text-sm whitespace-pre-wrap bg-muted p-4 rounded-md font-sans">{orderSummaryForPopup}</pre>
+              <AlertDialogDescription className="text-sm text-foreground space-y-3 my-4">
+                <p className="font-semibold text-lg">--- ¡IMPORTANTE! Instrucciones para Finalizar tu Pedido ---</p>
+                <p>Tu ID de Pedido es: <span className="font-bold">{currentOrderId}</span></p>
+                <p>Para finalizar tu compra, por favor, sigue estos pasos:</p>
+                <ol className="list-decimal list-inside space-y-1 pl-4">
+                  <li>Envía un correo electrónico a: <span className="font-semibold">{SELLER_EMAIL}</span>
+                    <ul className="list-disc list-inside pl-6">
+                        <li>Asunto del correo: <span className="font-bold text-primary">Nuevo Pedido - ID: {currentOrderId}</span> (¡Copia y pega esto!)</li>
+                        <li>Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo.</li>
+                    </ul>
+                  </li>
+                  <li>Pago:
+                    <ul className="list-disc list-inside pl-6">
+                      <li>Realiza el pago del TOTAL DEL PEDIDO <span className="font-bold">(€{totalPriceValue.toFixed(2)})</span> por Bizum al número que te facilitaremos por correo electrónico tras recibir tu email de pedido.</li>
+                      <li>Importante: Indica el ID del Pedido (<span className="font-bold">{currentOrderId}</span>) en el concepto del Bizum.</li>
+                    </ul>
+                  </li>
+                  <li>Confirmación:
+                    <ul className="list-disc list-inside pl-6">
+                       <li>Tu pedido comenzará a elaborarse una vez recibido tanto el correo electrónico como la confirmación del pago.</li>
+                    </ul>
+                  </li>
+                </ol>
+                <p className="mt-3">¡Gracias por tu compra en Marivelas!</p>
+                <hr className="my-3"/>
+                <p className="font-semibold">RESUMEN DE TU PEDIDO (para copiar en el email):</p>
+              </AlertDialogDescription>
+              <div className="max-h-[30vh] overflow-y-auto py-1">
+                <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
               </div>
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={handleCancelSummaryPopup}>Cancelar</AlertDialogCancel>
@@ -247,14 +254,13 @@ export default function CartDisplay() {
             </AlertDialogContent>
           </AlertDialog>
 
-          {/* Second Confirmation Dialog for Clearing Cart (can also be used for clearing from button) */}
           <AlertDialog open={isClearCartConfirmPopupOpen} onOpenChange={(open) => {
-            if (cartItems.length === 0 && open) { // Prevent opening if cart is already empty
+            if (cartItems.length === 0 && open) {
                  setIsClearCartConfirmPopupOpen(false);
                  return;
             }
             if (!open) {
-                handleCancelClearCart(); // Handles reset of flags if needed
+                handleCancelClearCart();
             } else {
                 setIsClearCartConfirmPopupOpen(open);
             }
@@ -280,7 +286,7 @@ export default function CartDisplay() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={handleCancelClearCart}>{currentOrderId ? 'No, Volver al Carrito' : 'Cancelar'}</AlertDialogCancel>
-                <AlertDialogAction 
+                <AlertDialogAction
                   onClick={currentOrderId ? handleConfirmClearCartAndFinalize : () => { clearCart(); setIsClearCartConfirmPopupOpen(false); }}
                   className={currentOrderId ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}
                 >
@@ -295,5 +301,3 @@ export default function CartDisplay() {
     </div>
   );
 }
-
-    
