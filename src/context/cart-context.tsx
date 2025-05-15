@@ -16,10 +16,11 @@ interface CartContextType {
   updatePackagingOption: (option: PackagingType) => void;
   clearCart: () => void;
   getItemCount: () => number;
-  getSubtotal: number; // Changed from () => number
-  getPackagingCost: number; // Changed from () => number
-  getShippingCost: () => number;
-  getTotalPrice: number; // Changed from () => number
+  getSubtotal: number;
+  getPackagingCost: number;
+  getShippingCost: () => number; // Corrected syntax
+  getTotalPrice: number;
+  isCartLoaded: boolean; // New state to indicate if cart has been loaded from localStorage
 }
 
 export const CartContext = createContext<CartContextType>({
@@ -31,10 +32,11 @@ export const CartContext = createContext<CartContextType>({
   updatePackagingOption: () => {},
   clearCart: () => {},
   getItemCount: () => 0,
-  getSubtotal: 0, // Default value
-  getPackagingCost: 0, // Default value
-  getShippingCost: () => SHIPPING_COST, // Fixed for now
-  getTotalPrice: 0, // Default value
+  getSubtotal: 0,
+  getPackagingCost: 0,
+  getShippingCost: () => SHIPPING_COST,
+  getTotalPrice: 0,
+  isCartLoaded: false, // Default to false
 });
 
 interface CartProviderProps {
@@ -42,22 +44,36 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<CartItemType[]>(() => {
-    if (typeof window !== 'undefined') {
-      const localData = localStorage.getItem('marivelasCart');
-      return localData ? JSON.parse(localData) : [];
-    }
-    return [];
-  });
-
+  const [cartItems, setCartItems] = useState<CartItemType[]>([]); // Initialize with empty array
   const [packagingOption, setPackagingOption] = useState<PackagingType>('standard');
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
 
+  // Load cart from localStorage on client-side after mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('marivelasCart', JSON.stringify(cartItems));
-      // We could also store packagingOption in localStorage if needed
+    const localData = localStorage.getItem('marivelasCart');
+    if (localData) {
+      try {
+        setCartItems(JSON.parse(localData));
+      } catch (error) {
+        console.error("Error parsing cart data from localStorage", error);
+        setCartItems([]); // Fallback to empty cart on error
+      }
     }
-  }, [cartItems]);
+    // Optionally, load packaging option if stored
+    const localPackaging = localStorage.getItem('marivelasPackaging');
+    if (localPackaging) {
+      setPackagingOption(localPackaging as PackagingType);
+    }
+    setIsCartLoaded(true); // Signal that cart is loaded/attempted to load
+  }, []);
+
+  // Save cart and packaging option to localStorage whenever they change
+  useEffect(() => {
+    if (isCartLoaded) { // Only save after initial load
+      localStorage.setItem('marivelasCart', JSON.stringify(cartItems));
+      localStorage.setItem('marivelasPackaging', packagingOption);
+    }
+  }, [cartItems, packagingOption, isCartLoaded]);
 
   const addToCart = (candle: Candle, color: CandleColorOption) => {
     setCartItems(prevItems => {
@@ -96,7 +112,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
-    setPackagingOption('standard'); // Reset packaging on clear
+    setPackagingOption('standard');
   };
 
   const getItemCount = () => {
@@ -112,36 +128,36 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       return cartItems.length > 0 ? STANDARD_PACKAGING_COST : 0;
     }
     if (packagingOption === 'premium') {
-      const totalItems = getItemCount(); // Call getItemCount directly
-      return totalItems * PREMIUM_PACKAGING_COST_PER_ITEM;
+      const totalCandleUnits = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      return totalCandleUnits * PREMIUM_PACKAGING_COST_PER_ITEM;
     }
     return 0;
-  }, [packagingOption, cartItems, getItemCount]); // getItemCount is a dependency if it's not stable
+  }, [packagingOption, cartItems]);
 
-  const getShippingCost = () => {
-    return cartItems.length > 0 ? SHIPPING_COST : 0; // Only apply shipping if there are items
-  };
+  const currentShippingCost = useMemo(() => {
+    return cartItems.length > 0 ? SHIPPING_COST : 0;
+  }, [cartItems]);
 
   const totalPrice = useMemo(() => {
-    // Use the memoized values directly
-    return subtotal + packagingCost + getShippingCost();
-  }, [subtotal, packagingCost, getShippingCost]); // getShippingCost is a dependency
+    return subtotal + packagingCost + currentShippingCost;
+  }, [subtotal, packagingCost, currentShippingCost]);
 
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems, 
+    <CartContext.Provider value={{
+      cartItems,
       packagingOption,
-      addToCart, 
-      removeFromCart, 
-      updateQuantity, 
+      addToCart,
+      removeFromCart,
+      updateQuantity,
       updatePackagingOption,
-      clearCart, 
-      getItemCount, 
-      getSubtotal: subtotal, // Pass the value
-      getPackagingCost: packagingCost, // Pass the value
-      getShippingCost, // Pass the function
-      getTotalPrice: totalPrice // Pass the value
+      clearCart,
+      getItemCount,
+      getSubtotal: subtotal,
+      getPackagingCost: packagingCost,
+      getShippingCost: () => currentShippingCost, // Provide a function that returns the memoized value
+      getTotalPrice: totalPrice,
+      isCartLoaded,
     }}>
       {children}
     </CartContext.Provider>

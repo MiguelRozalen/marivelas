@@ -1,8 +1,9 @@
+
 // src/components/layout/header.tsx
 "use client";
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Menu as MenuIcon, LayoutGrid } from 'lucide-react'; // Added MenuIcon and LayoutGrid
+import { ShoppingCart, Menu as MenuIcon, LayoutGrid } from 'lucide-react';
 import { useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 export default function Header() {
-  const { cartItems } = useContext(CartContext);
+  const { cartItems, isCartLoaded } = useContext(CartContext); // Get isCartLoaded
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -39,13 +40,13 @@ export default function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link href="/#catalog" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium flex items-center">
-            <LayoutGrid className="h-5 w-5 mr-1.5" /> 
+            <LayoutGrid className="h-5 w-5 mr-1.5" />
             Catálogo
           </Link>
           <Link href="/carrito" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium flex items-center relative">
             <ShoppingCart className="h-5 w-5 mr-1.5" />
             Carrito
-            {totalItems > 0 && (
+            {isCartLoaded && totalItems > 0 && ( // Check isCartLoaded here
               <Badge variant="default" className="absolute -top-2 -right-3 h-5 w-5 p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground rounded-full">
                 {totalItems}
               </Badge>
@@ -74,7 +75,7 @@ export default function Header() {
                 <Link href="/carrito" className="flex items-center w-full">
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Carrito
-                  {totalItems > 0 && (
+                  {isCartLoaded && totalItems > 0 && ( // Check isCartLoaded here
                     <Badge variant="default" className="ml-auto h-5 w-5 p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground rounded-full">
                       {totalItems}
                     </Badge>
