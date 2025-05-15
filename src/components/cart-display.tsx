@@ -103,8 +103,6 @@ export default function CartDisplay() {
 
   const handleCancelClearCart = () => {
     setIsClearCartConfirmPopupOpen(false);
-    // If canceling the final confirmation, and an orderId was set (meaning they came from the instructions popup),
-    // nullify the orderId so a new one is generated if they try to checkout again.
     if (currentOrderId) {
         setCurrentOrderId(null);
     }
@@ -217,8 +215,7 @@ export default function CartDisplay() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirmación e Instrucciones del Pedido</AlertDialogTitle>
               </AlertDialogHeader>
-              <AlertDialogDescription className="text-sm text-foreground space-y-3 my-4">
-                <p className="font-semibold text-lg">--- ¡IMPORTANTE! Instrucciones para Finalizar tu Pedido ---</p>
+              <AlertDialogDescription className="text-sm text-foreground space-y-3 mt-2 mb-4"> {/* Adjusted margins and removed specific heading */}
                 <p>Tu ID de Pedido es: <span className="font-bold">{currentOrderId}</span></p>
                 <p>Para finalizar tu compra, por favor, sigue estos pasos:</p>
                 <ol className="list-decimal list-inside space-y-1 pl-4">
@@ -301,3 +298,4 @@ export default function CartDisplay() {
     </div>
   );
 }
+
