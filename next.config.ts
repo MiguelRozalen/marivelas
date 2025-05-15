@@ -9,8 +9,14 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    // remotePatterns configuration for placehold.co is removed
-    // as candle images are now local.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        port: '',
+        pathname: '/**',
+      },
+    ],
     // If you have other remote image sources, add their patterns here.
   },
 };
