@@ -102,16 +102,60 @@ export default function CartDisplay() {
 
   const handleCancelClearCart = () => {
     setIsClearCartConfirmPopupOpen(false);
-    if (currentOrderId) { // If there was an order ID (meaning we came from the instructions popup)
-        setCurrentOrderId(null); // Reset order ID if they cancel the final confirmation
+    if (currentOrderId) { 
+        setCurrentOrderId(null); 
     }
-    proceedingToNextStepRef.current = false; // Always reset this
+    proceedingToNextStepRef.current = false; 
   }
 
   const handleCancelSummaryPopup = () => {
     setIsSummaryPopupOpen(false);
     setCurrentOrderId(null);
   }
+
+  const handleCopyInstructions = async () => {
+    if (!currentOrderId || !orderEmailBodyForPopup) return;
+
+    const instructionsText = `
+Instrucciones para Finalizar tu Pedido (ID: ${currentOrderId}):
+
+PASO 1: Envía un Correo Electrónico
+------------------------------------
+A: ${SELLER_EMAIL}
+Asunto: Nuevo Pedido - ID: ${currentOrderId}
+Cuerpo del Correo (copia y pega el siguiente resumen):
+${orderEmailBodyForPopup}
+
+PASO 2: Realiza el Pago
+------------------------------------
+Importe TOTAL DEL PEDIDO: €${totalPriceValue.toFixed(2)}
+Método: Bizum (el número se te facilitará por correo electrónico tras recibir tu email de pedido).
+Concepto del Bizum (indica tu ID de pedido): ${currentOrderId}
+
+PASO 3: Confirmación
+------------------------------------
+Tu pedido comenzará a elaborarse una vez recibido tanto el correo electrónico como la confirmación del pago.
+
+Por favor, asegúrate de completar todos los pasos.
+    `;
+
+    try {
+      await navigator.clipboard.writeText(instructionsText.trim());
+      toast({
+        title: "¡Instrucciones Copiadas!",
+        description: "Las instrucciones del pedido se han copiado a tu portapapeles.",
+        action: <CheckCircle className="h-5 w-5 text-green-500" />,
+      });
+    } catch (err) {
+      toast({
+        title: "Error al Copiar",
+        description: "No se pudieron copiar las instrucciones. Por favor, inténtalo manualmente.",
+        variant: "destructive",
+        action: <AlertTriangle className="h-5 w-5" />, // Assuming AlertTriangle is already imported/available
+      });
+      console.error('Failed to copy instructions: ', err);
+    }
+  };
 
 
   if (cartItems.length === 0) {
@@ -195,11 +239,11 @@ export default function CartDisplay() {
             open={isSummaryPopupOpen}
             onOpenChange={(openState) => {
               setIsSummaryPopupOpen(openState);
-              if (!openState) { // Closing the dialog
+              if (!openState) { 
                 if (proceedingToNextStepRef.current) {
-                  // If proceeding to next dialog, ref will be reset when second dialog handles its closure or confirmation
+                   proceedingToNextStepRef.current = false; 
                 } else {
-                   setCurrentOrderId(null); // Cancelled first dialog directly (ESC, click outside)
+                   setCurrentOrderId(null); 
                 }
               }
             }}
@@ -262,15 +306,11 @@ export default function CartDisplay() {
                     </div>
                   </div>
                   
-                  <p className="mt-6">¡Gracias por tu compra en Marivelas!</p>
+                  {/* Removed thank you message from here */}
                 </div>
               </AlertDialogDescription>
-              {/* Moved the pre block into Step 1 above
-              <div className="max-h-[20vh] overflow-y-auto py-1">
-                <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
-              </div>
-              */}
               <AlertDialogFooter>
+                <Button variant="outline" onClick={handleCopyInstructions}>Copiar Instrucciones</Button>
                 <AlertDialogCancel onClick={handleCancelSummaryPopup}>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={handleInstructionsAcknowledged}>Entendido, Continuar</AlertDialogAction>
               </AlertDialogFooter>
@@ -278,17 +318,17 @@ export default function CartDisplay() {
           </AlertDialog>
 
           <AlertDialog open={isClearCartConfirmPopupOpen} onOpenChange={(open) => {
-            if (cartItems.length === 0 && open && currentOrderId) { // if cart got emptied while this dialog was about to open for an order.
+            if (cartItems.length === 0 && open && currentOrderId) { 
                  setIsClearCartConfirmPopupOpen(false);
                  setCurrentOrderId(null);
                  return;
             }
-            if (!open) { // Closing the dialog
-                if (!proceedingToNextStepRef.current) { // If not proceeding from "confirm" (i.e., cancel was clicked or ESC)
-                    setCurrentOrderId(null); // Reset order ID if they cancel the final confirmation for an order
-                } // if proceedingToNextStepRef.current is true, it means "Yes, Confirm and Clear" was clicked, ID will be reset there
+            if (!open) { 
+                if (!proceedingToNextStepRef.current) { 
+                    setCurrentOrderId(null); 
+                } 
                 setIsClearCartConfirmPopupOpen(false);
-            } else { // Opening the dialog
+            } else { 
                 setIsClearCartConfirmPopupOpen(open);
             }
           }}>
@@ -313,12 +353,11 @@ export default function CartDisplay() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => {
-                    // This is the cancel for the *second* dialog (Confirm Clear Cart)
                     setIsClearCartConfirmPopupOpen(false);
-                    if (currentOrderId) { // If this was a confirmation for an order...
-                        setCurrentOrderId(null); // ...reset the order ID as they are backing out.
+                    if (currentOrderId) { 
+                        setCurrentOrderId(null); 
                     }
-                    proceedingToNextStepRef.current = false; // Ensure this is reset
+                    proceedingToNextStepRef.current = false; 
                 }}>{currentOrderId ? 'No, Volver al Carrito' : 'Cancelar'}</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={currentOrderId ? handleConfirmClearCartAndFinalize : () => { clearCart(); setIsClearCartConfirmPopupOpen(false); proceedingToNextStepRef.current = false; setCurrentOrderId(null);}}
@@ -335,3 +374,4 @@ export default function CartDisplay() {
     </div>
   );
 }
+
