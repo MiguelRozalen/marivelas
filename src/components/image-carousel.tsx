@@ -37,7 +37,6 @@ interface CarouselImageItemProps {
 function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index }: CarouselImageItemProps) {
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
   const [isImageLoading, setIsImageLoading] = useState(true);
-  // Unique key for NextImage to force re-render if src changes, especially to placeholder
   const [imageKey, setImageKey] = useState(0);
 
   useEffect(() => {
@@ -81,7 +80,7 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index }: 
         data-ai-hint={dataAiHint}
         onLoad={handleImageLoad}
         onError={handleImageError}
-        priority={index === 0} // Prioritize the first image
+        priority={index === 0}
       />
     </div>
   );
@@ -96,23 +95,7 @@ export default function ImageCarousel({
   placeholderBaseUrl = "https://placehold.co/",
   placeholderDimensions = "400x300"
 }: ImageCarouselProps) {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
   const fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
 
   if (!imageUrls || imageUrls.length === 0) {
     return (
@@ -124,7 +107,7 @@ export default function ImageCarousel({
 
   return (
     <div className="relative w-full">
-      <Carousel setApi={setApi} className="w-full">
+      <Carousel className="w-full">
         <CarouselContent>
           {imageUrls.map((url, index) => (
             <CarouselItem key={index} className={cn(aspectRatio, "relative")}>
@@ -145,11 +128,13 @@ export default function ImageCarousel({
           </>
         )}
       </Carousel>
+      {/* Removed image count indicator
       {imageUrls.length > 1 && (
         <div className="py-2 text-center text-sm text-muted-foreground">
           {current} / {count}
         </div>
       )}
+      */}
     </div>
   );
 }
