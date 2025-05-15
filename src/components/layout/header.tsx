@@ -2,7 +2,7 @@
 "use client";
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Menu as MenuIcon, Flame } from 'lucide-react'; // Added MenuIcon
+import { ShoppingCart, Menu as MenuIcon, LayoutGrid } from 'lucide-react'; // Added MenuIcon and LayoutGrid
 import { useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { Badge } from '@/components/ui/badge';
@@ -38,7 +38,8 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/#catalog" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">
+          <Link href="/#catalog" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium flex items-center">
+            <LayoutGrid className="h-5 w-5 mr-1.5" /> 
             Catálogo
           </Link>
           <Link href="/carrito" className="text-foreground hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium flex items-center relative">
@@ -64,6 +65,7 @@ export default function Header() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
                 <Link href="/#catalog" className="flex items-center w-full">
+                  <LayoutGrid className="h-5 w-5 mr-2" />
                   Catálogo
                 </Link>
               </DropdownMenuItem>
