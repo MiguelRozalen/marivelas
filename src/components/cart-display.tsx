@@ -7,7 +7,7 @@ import { CartContext } from '@/context/cart-context';
 import CartItem from './cart-item';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingBag, Trash2, Package, PackageCheck, Info, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ShoppingBag, Trash2, Package, PackageCheck, Info, CheckCircle, AlertTriangle, Send, CreditCard, PackageSearch } from 'lucide-react';
 import Link from 'next/link';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -103,7 +103,7 @@ export default function CartDisplay() {
 
   const handleCancelClearCart = () => {
     setIsClearCartConfirmPopupOpen(false);
-    if (currentOrderId) {
+    if (currentOrderId && !proceedingToNextStepRef.current) { // Only reset if not proceeding from first dialog
         setCurrentOrderId(null);
     }
   }
@@ -197,11 +197,9 @@ export default function CartDisplay() {
               setIsSummaryPopupOpen(openState);
               if (!openState) {
                 if (proceedingToNextStepRef.current) {
-                  proceedingToNextStepRef.current = false;
+                  // If proceeding, ref will be reset after second dialog handles its closure or confirmation
                 } else {
-                  if (currentOrderId !== null) {
-                     setCurrentOrderId(null);
-                  }
+                   setCurrentOrderId(null); // Cancelled first dialog directly
                 }
               }
             }}
@@ -215,31 +213,53 @@ export default function CartDisplay() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirmación e Instrucciones del Pedido</AlertDialogTitle>
               </AlertDialogHeader>
-              <AlertDialogDescription className="text-sm text-foreground space-y-3 mt-2 mb-4"> {/* Adjusted margins and removed specific heading */}
-                <p>Tu ID de Pedido es: <span className="font-bold">{currentOrderId}</span></p>
-                <p>Para finalizar tu compra, por favor, sigue estos pasos:</p>
-                <ol className="list-decimal list-inside space-y-1 pl-4">
-                  <li>Envía un correo electrónico a: <span className="font-semibold">{SELLER_EMAIL}</span>
-                    <ul className="list-disc list-inside pl-6">
-                        <li>Asunto del correo: <span className="font-bold text-primary">Nuevo Pedido - ID: {currentOrderId}</span> (¡Copia y pega esto!)</li>
-                        <li>Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo.</li>
-                    </ul>
-                  </li>
-                  <li>Pago:
-                    <ul className="list-disc list-inside pl-6">
-                      <li>Realiza el pago del TOTAL DEL PEDIDO <span className="font-bold">(€{totalPriceValue.toFixed(2)})</span> por Bizum al número que te facilitaremos por correo electrónico tras recibir tu email de pedido.</li>
-                      <li>Importante: Indica el ID del Pedido (<span className="font-bold">{currentOrderId}</span>) en el concepto del Bizum.</li>
-                    </ul>
-                  </li>
-                  <li>Confirmación:
-                    <ul className="list-disc list-inside pl-6">
-                       <li>Tu pedido comenzará a elaborarse una vez recibido tanto el correo electrónico como la confirmación del pago.</li>
-                    </ul>
-                  </li>
-                </ol>
-                <p className="mt-3">¡Gracias por tu compra en Marivelas!</p>
-                <hr className="my-3"/>
-                <p className="font-semibold">RESUMEN DE TU PEDIDO (para copiar en el email):</p>
+              <AlertDialogDescription asChild>
+                <div className="text-sm text-foreground space-y-3 mt-2 mb-4">
+                  <p className="mb-4">Tu ID de Pedido es: <span className="font-bold">{currentOrderId}</span>. Para finalizar tu compra, por favor, sigue estos pasos:</p>
+                  
+                  <div className="space-y-6">
+                    {/* Step 1: Send Email */}
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold mr-4">1</div>
+                      <div className="flex-1">
+                        <h4 className="text-md font-semibold text-foreground mb-1">Envía un correo electrónico</h4>
+                        <p className="text-xs text-muted-foreground">A: <span className="font-medium text-foreground">{SELLER_EMAIL}</span></p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Asunto del correo (¡Copia y pega esto!): <br/>
+                          <code className="text-xs bg-muted text-muted-foreground p-1 rounded block mt-1 break-all">{`Nuevo Pedido - ID: ${currentOrderId}`}</code>
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo.</p>
+                      </div>
+                    </div>
+
+                    {/* Step 2: Payment */}
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold mr-4">2</div>
+                      <div className="flex-1">
+                        <h4 className="text-md font-semibold text-foreground mb-1">Realiza el Pago</h4>
+                        <p className="text-xs text-muted-foreground">Importe TOTAL DEL PEDIDO: <span className="font-medium text-foreground">€{totalPriceValue.toFixed(2)}</span></p>
+                        <p className="text-xs text-muted-foreground mt-1">Método: Bizum (el número se te facilitará por correo electrónico tras recibir tu email de pedido).</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Importante - Concepto del Bizum (indica tu ID de pedido): <br/>
+                          <code className="text-xs bg-muted text-muted-foreground p-1 rounded block mt-1 break-all">{currentOrderId}</code>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 3: Confirmation */}
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold mr-4">3</div>
+                      <div className="flex-1">
+                        <h4 className="text-md font-semibold text-foreground mb-1">Confirmación</h4>
+                        <p className="text-xs text-muted-foreground">Tu pedido comenzará a elaborarse una vez recibido tanto el correo electrónico como la confirmación del pago.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p className="mt-6">¡Gracias por tu compra en Marivelas!</p>
+                  <hr className="my-3"/>
+                  <p className="font-semibold">RESUMEN DE TU PEDIDO (para copiar en el email):</p>
+                </div>
               </AlertDialogDescription>
               <div className="max-h-[30vh] overflow-y-auto py-1">
                 <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
@@ -256,9 +276,12 @@ export default function CartDisplay() {
                  setIsClearCartConfirmPopupOpen(false);
                  return;
             }
-            if (!open) {
-                handleCancelClearCart();
-            } else {
+            if (!open) { // Closing the dialog
+                if (!proceedingToNextStepRef.current) { // If not proceeding (i.e., cancel was clicked or ESC)
+                    setCurrentOrderId(null);
+                }
+                setIsClearCartConfirmPopupOpen(false); // Always ensure it's marked as closed
+            } else { // Opening the dialog
                 setIsClearCartConfirmPopupOpen(open);
             }
           }}>
@@ -282,10 +305,14 @@ export default function CartDisplay() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={handleCancelClearCart}>{currentOrderId ? 'No, Volver al Carrito' : 'Cancelar'}</AlertDialogCancel>
+                <AlertDialogCancel onClick={() => {
+                    setIsClearCartConfirmPopupOpen(false);
+                    setCurrentOrderId(null); // Reset order ID if they cancel the final confirmation
+                    proceedingToNextStepRef.current = false;
+                }}>{currentOrderId ? 'No, Volver al Carrito' : 'Cancelar'}</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={currentOrderId ? handleConfirmClearCartAndFinalize : () => { clearCart(); setIsClearCartConfirmPopupOpen(false); }}
-                  className={currentOrderId ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}
+                  onClick={currentOrderId ? handleConfirmClearCartAndFinalize : () => { clearCart(); setIsClearCartConfirmPopupOpen(false); proceedingToNextStepRef.current = false; }}
+                  className={currentOrderId ? "bg-primary hover:bg-primary/90" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}
                 >
                   {currentOrderId ? 'Sí, Confirmar y Vaciar' : 'Sí, Vaciar Carrito'}
                 </AlertDialogAction>
