@@ -269,14 +269,13 @@ Por favor, asegúrate de completar todos los pasos.
                         <h4 className="text-md font-semibold text-foreground mb-1">Envía un correo electrónico</h4>
                         <p className="text-xs text-muted-foreground">A: <span className="font-medium text-foreground">{SELLER_EMAIL}</span></p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Asunto del correo (¡Copia y pega esto!): <br/>
+                          Asunto del correo: <br/>
                           <code className="text-xs bg-muted text-muted-foreground p-1 rounded block mt-1 break-all">{`Nuevo Pedido - ID: ${currentOrderId}`}</code>
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo.</p>
                         
-                        {/* Removed HR and "Resumen de tu pedido" text */}
                         <div className="max-h-[20vh] overflow-y-auto py-1 mt-1">
-                            <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
+                            <pre className="text-xs whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
                         </div>
                       </div>
                     </div>
