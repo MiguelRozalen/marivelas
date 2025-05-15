@@ -1,7 +1,8 @@
+
 // src/components/cart-item.tsx
 "use client";
 
-import NextImage from 'next/image'; // Renamed to NextImage
+import NextImage from 'next/image';
 import type { CartItemType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,8 @@ import { XCircle, PlusCircle, MinusCircle } from 'lucide-react';
 import { useContext, useState, useEffect } from 'react';
 import { CartContext } from '@/context/cart-context';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface CartItemProps {
   item: CartItemType;
@@ -21,41 +24,55 @@ export default function CartItem({ item }: CartItemProps) {
 
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(item.candle.imageUrl);
   const [imageKey, setImageKey] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   useEffect(() => {
-    setEffectiveImageUrl(item.candle.imageUrl); // Reset if item prop changes
+    setEffectiveImageUrl(item.candle.imageUrl);
+    setIsImageLoading(true); // Start loading when item.candle.imageUrl changes
     setImageKey(prev => prev + 1);
   }, [item.candle.imageUrl]);
 
-  const handleQuantityChange = (newQuantity: number) => {
-    updateQuantity(item.id, newQuantity);
+  const handleImageLoadOrError = () => {
+    setIsImageLoading(false); // Stop loading whether success or handled error
   };
 
   const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
+    handleImageLoadOrError();
     if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
       setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
       setImageKey(prevKey => prevKey + 1);
     }
   };
   
-  const handleImageError = () => { // Fallback for external images or if onLoadingComplete doesn't catch it
+  const handleImageError = () => {
+    handleImageLoadOrError();
     if (effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
       setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
       setImageKey(prevKey => prevKey + 1);
     }
   };
 
+  const handleQuantityChange = (newQuantity: number) => {
+    updateQuantity(item.id, newQuantity);
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b bg-card rounded-lg shadow mb-4 gap-4">
       <div className="flex items-center gap-4 w-full sm:w-auto">
-        <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden">
+        <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden bg-muted/50"> {/* Added bg-muted for skeleton base */}
+          {isImageLoading && (
+            <Skeleton className="absolute inset-0 h-full w-full" />
+          )}
           <NextImage
             key={`${item.id}-${imageKey}`}
             src={effectiveImageUrl}
             alt={item.candle.name}
             fill
             sizes="100px"
-            className="object-cover"
+            className={cn(
+              "object-cover",
+              isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
+            )}
             data-ai-hint={item.candle.dataAiHint}
             onLoadingComplete={handleImageLoadingComplete}
             onError={handleImageError}

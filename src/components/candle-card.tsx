@@ -1,7 +1,8 @@
+
 // src/components/candle-card.tsx
 "use client";
 
-import NextImage from 'next/image'; // Renamed to NextImage to avoid conflict if we were to name state variable 'image'
+import NextImage from 'next/image';
 import type { Candle } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,8 @@ import { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, CheckCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface CandleCardProps {
   candle: Candle;
@@ -25,15 +28,38 @@ export default function CandleCard({ candle }: CandleCardProps) {
   const { toast } = useToast();
 
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(candle.imageUrl);
-  const [imageKey, setImageKey] = useState(0); // To force re-render of Image component
+  const [imageKey, setImageKey] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   useEffect(() => {
-    setEffectiveImageUrl(candle.imageUrl); // Reset if candle prop changes
-    setImageKey(prev => prev + 1); // And ensure image re-evaluates
+    setEffectiveImageUrl(candle.imageUrl);
+    setIsImageLoading(true); // Start loading when candle.imageUrl changes
+    setImageKey(prev => prev + 1);
   }, [candle.imageUrl]);
 
+  const handleImageLoadOrError = () => {
+    setIsImageLoading(false); // Stop loading whether success or handled error
+  };
+
+  const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
+    handleImageLoadOrError();
+    // Check naturalWidth to confirm if the image loaded successfully
+    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
+      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
+      setImageKey(prevKey => prevKey + 1); // Force re-render with placeholder
+    }
+  };
+  
+  const handleImageError = () => { // Fallback for other types of errors
+    handleImageLoadOrError();
+    if (effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
+      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
+      setImageKey(prevKey => prevKey + 1);
+    }
+  };
+
   const handleAddToCart = () => {
-    addToCart(candle, selectedColor);
+    addToCart(candle, selectedColor); // Quantity 1 is handled by addToCart logic
     toast({
       title: "¡Añadido al carrito!",
       description: `${candle.name} (Color: ${selectedColor.name}) ha sido añadido a tu carrito.`,
@@ -41,35 +67,27 @@ export default function CandleCard({ candle }: CandleCardProps) {
     });
   };
 
-  const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
-    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
-      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
-      setImageKey(prevKey => prevKey + 1);
-    }
-  };
-  
-  const handleImageError = () => { // Fallback for external images or if onLoadingComplete doesn't catch it
-    if (effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
-      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
-      setImageKey(prevKey => prevKey + 1);
-    }
-  };
-
-
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
       <CardHeader className="p-0">
-        <div className="aspect-[4/3] relative w-full">
+        <div className="aspect-[4/3] relative w-full bg-muted/50"> {/* Added bg-muted as a base for skeleton */}
+          {isImageLoading && (
+            <Skeleton className="absolute inset-0 h-full w-full rounded-t-lg" />
+          )}
           <NextImage
-            key={`${candle.id}-${imageKey}`} // Ensure re-render if src changes to placeholder
+            key={`${candle.id}-${imageKey}`}
             src={effectiveImageUrl}
             alt={candle.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
+            className={cn(
+              "object-cover rounded-t-lg",
+              isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
+            )}
             data-ai-hint={candle.dataAiHint}
             onLoadingComplete={handleImageLoadingComplete}
-            onError={handleImageError} // Good to have for external URLs, or if placeholder itself fails
+            onError={handleImageError}
+            priority={false} // Set to true for above-the-fold images if needed
           />
         </div>
       </CardHeader>
