@@ -1,12 +1,12 @@
 // src/components/cart-item.tsx
 "use client";
 
-import Image from 'next/image';
+import NextImage from 'next/image'; // Renamed to NextImage
 import type { CartItemType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { XCircle, PlusCircle, MinusCircle } from 'lucide-react';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { CartContext } from '@/context/cart-context';
 import Link from 'next/link';
 
@@ -14,24 +14,51 @@ interface CartItemProps {
   item: CartItemType;
 }
 
+const PLACEHOLDER_CART_IMAGE_URL = "https://placehold.co/96x96.png";
+
 export default function CartItem({ item }: CartItemProps) {
   const { removeFromCart, updateQuantity } = useContext(CartContext);
 
+  const [effectiveImageUrl, setEffectiveImageUrl] = useState(item.candle.imageUrl);
+  const [imageKey, setImageKey] = useState(0);
+
+  useEffect(() => {
+    setEffectiveImageUrl(item.candle.imageUrl); // Reset if item prop changes
+    setImageKey(prev => prev + 1);
+  }, [item.candle.imageUrl]);
+
   const handleQuantityChange = (newQuantity: number) => {
     updateQuantity(item.id, newQuantity);
+  };
+
+  const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
+    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
+      setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
+      setImageKey(prevKey => prevKey + 1);
+    }
+  };
+  
+  const handleImageError = () => { // Fallback for external images or if onLoadingComplete doesn't catch it
+    if (effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
+      setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
+      setImageKey(prevKey => prevKey + 1);
+    }
   };
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b bg-card rounded-lg shadow mb-4 gap-4">
       <div className="flex items-center gap-4 w-full sm:w-auto">
         <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden">
-          <Image
-            src={item.candle.imageUrl}
+          <NextImage
+            key={`${item.id}-${imageKey}`}
+            src={effectiveImageUrl}
             alt={item.candle.name}
             fill
             sizes="100px"
             className="object-cover"
             data-ai-hint={item.candle.dataAiHint}
+            onLoadingComplete={handleImageLoadingComplete}
+            onError={handleImageError}
           />
         </div>
         <div className="flex-grow">
@@ -47,7 +74,7 @@ export default function CartItem({ item }: CartItemProps) {
             ></span>
             <span className="ml-2 text-sm text-muted-foreground">{item.color.name}</span>
           </div>
-          <p className="text-sm text-muted-foreground">Precio unitario: €{item.candle.price.toFixed(2)}</p> {/* Currency updated to € */}
+          <p className="text-sm text-muted-foreground">Precio unitario: €{item.candle.price.toFixed(2)}</p>
         </div>
       </div>
 
@@ -74,8 +101,8 @@ export default function CartItem({ item }: CartItemProps) {
           </Button>
         </div>
 
-        <p className="text-lg font-semibold text-primary w-24 text-center sm:text-right"> {/* text-primary for brown color */}
-          €{(item.candle.price * item.quantity).toFixed(2)} {/* Currency updated to € */}
+        <p className="text-lg font-semibold text-primary w-24 text-center sm:text-right">
+          €{(item.candle.price * item.quantity).toFixed(2)}
         </p>
 
         <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="text-destructive hover:text-destructive/80" aria-label="Eliminar del carrito">

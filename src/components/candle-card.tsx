@@ -1,47 +1,75 @@
 // src/components/candle-card.tsx
 "use client";
 
-import Image from 'next/image';
+import NextImage from 'next/image'; // Renamed to NextImage to avoid conflict if we were to name state variable 'image'
 import type { Candle } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { AVAILABLE_CANDLE_COLORS, type CandleColorOption } from '@/config/candle-options';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, CheckCircle } from 'lucide-react'; // CheckCircle still imported but not used below
+import { ShoppingCart, CheckCircle } from 'lucide-react';
 
 interface CandleCardProps {
   candle: Candle;
 }
+
+const PLACEHOLDER_IMAGE_URL = "https://placehold.co/400x300.png";
 
 export default function CandleCard({ candle }: CandleCardProps) {
   const [selectedColor, setSelectedColor] = useState<CandleColorOption>(AVAILABLE_CANDLE_COLORS[0]);
   const { addToCart } = useContext(CartContext);
   const { toast } = useToast();
 
+  const [effectiveImageUrl, setEffectiveImageUrl] = useState(candle.imageUrl);
+  const [imageKey, setImageKey] = useState(0); // To force re-render of Image component
+
+  useEffect(() => {
+    setEffectiveImageUrl(candle.imageUrl); // Reset if candle prop changes
+    setImageKey(prev => prev + 1); // And ensure image re-evaluates
+  }, [candle.imageUrl]);
+
   const handleAddToCart = () => {
     addToCart(candle, selectedColor);
     toast({
       title: "¡Añadido al carrito!",
       description: `${candle.name} (Color: ${selectedColor.name}) ha sido añadido a tu carrito.`,
-      action: <CheckCircle className="h-5 w-5 text-green-500" />, // This CheckCircle is for the toast, not the selector
+      action: <CheckCircle className="h-5 w-5 text-green-500" />,
     });
   };
+
+  const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
+    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
+      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
+      setImageKey(prevKey => prevKey + 1);
+    }
+  };
+  
+  const handleImageError = () => { // Fallback for external images or if onLoadingComplete doesn't catch it
+    if (effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
+      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
+      setImageKey(prevKey => prevKey + 1);
+    }
+  };
+
 
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
       <CardHeader className="p-0">
         <div className="aspect-[4/3] relative w-full">
-          <Image
-            src={candle.imageUrl}
+          <NextImage
+            key={`${candle.id}-${imageKey}`} // Ensure re-render if src changes to placeholder
+            src={effectiveImageUrl}
             alt={candle.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
             data-ai-hint={candle.dataAiHint}
+            onLoadingComplete={handleImageLoadingComplete}
+            onError={handleImageError} // Good to have for external URLs, or if placeholder itself fails
           />
         </div>
       </CardHeader>
@@ -57,7 +85,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
               const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
               if (color) setSelectedColor(color);
             }}
-            className="flex flex-wrap gap-3" // Increased gap slightly for better spacing of smaller circles
+            className="flex flex-wrap gap-3"
             aria-label={`Opciones de color para ${candle.name}`}
           >
             {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
@@ -77,7 +105,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
                   style={{ backgroundColor: colorOpt.hexColor }}
                   title={colorOpt.name}
                 >
-                  {/* Checkmark icon removed from here */}
+                  {/* Checkmark icon removed */}
                 </Label>
               </div>
             ))}
