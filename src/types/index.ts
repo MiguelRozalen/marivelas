@@ -5,7 +5,7 @@ export interface Candle {
   id: string;
   name: string;
   price: number;
-  imageUrl: string;
+  imageUrls: string[]; // Changed from imageUrl to imageUrls
   dataAiHint: string;
   description?: string;
 }

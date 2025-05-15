@@ -2,52 +2,21 @@
 // src/components/cart-item.tsx
 "use client";
 
-import NextImage from 'next/image';
 import type { CartItemType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { XCircle, PlusCircle, MinusCircle } from 'lucide-react';
-import { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import ImageCarousel from './image-carousel'; // Import the new carousel component
 
 interface CartItemProps {
   item: CartItemType;
 }
 
-const PLACEHOLDER_CART_IMAGE_URL = "https://placehold.co/96x96.png";
-
 export default function CartItem({ item }: CartItemProps) {
   const { removeFromCart, updateQuantity } = useContext(CartContext);
-
-  const [effectiveImageUrl, setEffectiveImageUrl] = useState(item.candle.imageUrl);
-  const [imageKey, setImageKey] = useState(0);
-  const [isImageLoading, setIsImageLoading] = useState(true);
-
-  useEffect(() => {
-    setEffectiveImageUrl(item.candle.imageUrl);
-    setIsImageLoading(true);
-    setImageKey(prev => prev + 1);
-  }, [item.candle.imageUrl]);
-
-  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    setIsImageLoading(false);
-    const imgElement = event.currentTarget;
-    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
-      setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
-      setImageKey(prevKey => prevKey + 1);
-    }
-  };
-  
-  const handleImageError = () => {
-    setIsImageLoading(false);
-    if (effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
-      setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
-      setImageKey(prevKey => prevKey + 1);
-    }
-  };
 
   const handleQuantityChange = (newQuantity: number) => {
     updateQuantity(item.id, newQuantity);
@@ -56,23 +25,14 @@ export default function CartItem({ item }: CartItemProps) {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b bg-card rounded-lg shadow mb-4 gap-4">
       <div className="flex items-center gap-4 w-full sm:w-auto">
-        <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden bg-muted/50">
-          {isImageLoading && (
-            <Skeleton className="absolute inset-0 h-full w-full" />
-          )}
-          <NextImage
-            key={`${item.id}-${imageKey}`}
-            src={effectiveImageUrl}
-            alt={item.candle.name}
-            fill
-            sizes="100px"
-            className={cn(
-              "object-cover",
-              isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
-            )}
-            data-ai-hint={item.candle.dataAiHint}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
+        <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted/50">
+          {/* Replace NextImage with ImageCarousel */}
+          <ImageCarousel
+            imageUrls={item.candle.imageUrls}
+            altText={item.candle.name}
+            dataAiHint={item.candle.dataAiHint}
+            aspectRatio="aspect-square" // Square for cart items
+            placeholderDimensions="96x96"
           />
         </div>
         <div className="flex-grow">

@@ -2,58 +2,26 @@
 // src/components/candle-card.tsx
 "use client";
 
-import NextImage from 'next/image';
 import type { Candle } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { AVAILABLE_CANDLE_COLORS, type CandleColorOption } from '@/config/candle-options';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, CheckCircle } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import ImageCarousel from './image-carousel'; // Import the new carousel component
 
 interface CandleCardProps {
   candle: Candle;
 }
 
-const PLACEHOLDER_IMAGE_URL = "https://placehold.co/400x300.png";
-
 export default function CandleCard({ candle }: CandleCardProps) {
   const [selectedColor, setSelectedColor] = useState<CandleColorOption>(AVAILABLE_CANDLE_COLORS[0]);
   const { addToCart } = useContext(CartContext);
   const { toast } = useToast();
-
-  const [effectiveImageUrl, setEffectiveImageUrl] = useState(candle.imageUrl);
-  const [imageKey, setImageKey] = useState(0);
-  const [isImageLoading, setIsImageLoading] = useState(true);
-
-  useEffect(() => {
-    setEffectiveImageUrl(candle.imageUrl);
-    setIsImageLoading(true); // Start loading when candle.imageUrl changes
-    setImageKey(prev => prev + 1);
-  }, [candle.imageUrl]);
-
-  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    setIsImageLoading(false);
-    const imgElement = event.currentTarget;
-    // Check naturalWidth to confirm if the image loaded successfully
-    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
-      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
-      setImageKey(prevKey => prevKey + 1); // Force re-render with placeholder
-    }
-  };
-  
-  const handleImageError = () => { // Fallback for other types of errors
-    setIsImageLoading(false);
-    if (effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
-      setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
-      setImageKey(prevKey => prevKey + 1);
-    }
-  };
 
   const handleAddToCart = () => {
     addToCart(candle, selectedColor); 
@@ -67,26 +35,14 @@ export default function CandleCard({ candle }: CandleCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
       <CardHeader className="p-0">
-        <div className="aspect-[4/3] relative w-full bg-muted/50">
-          {isImageLoading && (
-            <Skeleton className="absolute inset-0 h-full w-full rounded-t-lg" />
-          )}
-          <NextImage
-            key={`${candle.id}-${imageKey}`}
-            src={effectiveImageUrl}
-            alt={candle.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={cn(
-              "object-cover rounded-t-lg",
-              isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
-            )}
-            data-ai-hint={candle.dataAiHint}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            priority={false}
-          />
-        </div>
+        {/* Replace NextImage with ImageCarousel */}
+        <ImageCarousel
+          imageUrls={candle.imageUrls}
+          altText={candle.name}
+          dataAiHint={candle.dataAiHint}
+          aspectRatio="aspect-[4/3]"
+          placeholderDimensions="400x300"
+        />
       </CardHeader>
       <CardContent className="p-6 flex-grow">
         <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
