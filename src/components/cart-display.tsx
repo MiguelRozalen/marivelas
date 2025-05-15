@@ -7,7 +7,7 @@ import { CartContext } from '@/context/cart-context';
 import CartItem from './cart-item';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingBag, Trash2, Package, PackageCheck, Info, CheckCircle, AlertTriangle, Send, CreditCard, PackageSearch } from 'lucide-react';
+import { ShoppingBag, Trash2, Package, PackageCheck, Info, CheckCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -46,9 +46,8 @@ export default function CartDisplay() {
   const generateOrderEmailBody = (orderId: string | null) => {
     if (cartItems.length === 0 && !orderId) return "";
 
-    let summary = `Asunto: Nuevo Pedido - ID: ${orderId}\n\n`;
-    summary += `Estimado equipo de Marivelas,\n\n`;
-    summary += `Quisiera realizar el siguiente pedido:\n\n`;
+    let summary = `Estimado equipo de Marivelas,\n\n`;
+    summary += `Quisiera realizar el siguiente pedido con ID: ${orderId}\n\n`;
 
     cartItems.forEach(item => {
       summary += `- ${item.candle.name} (Color: ${item.color.name}) x ${item.quantity} - €${(item.candle.price * item.quantity).toFixed(2)}\n`;
@@ -103,9 +102,10 @@ export default function CartDisplay() {
 
   const handleCancelClearCart = () => {
     setIsClearCartConfirmPopupOpen(false);
-    if (currentOrderId && !proceedingToNextStepRef.current) { // Only reset if not proceeding from first dialog
-        setCurrentOrderId(null);
+    if (currentOrderId) { // If there was an order ID (meaning we came from the instructions popup)
+        setCurrentOrderId(null); // Reset order ID if they cancel the final confirmation
     }
+    proceedingToNextStepRef.current = false; // Always reset this
   }
 
   const handleCancelSummaryPopup = () => {
@@ -183,7 +183,7 @@ export default function CartDisplay() {
 
       <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow gap-4">
         <div className="w-full sm:w-auto">
-          <Button variant="outline" onClick={() => setIsClearCartConfirmPopupOpen(true)} disabled={cartItems.length === 0} className="w-full sm:w-auto">
+          <Button variant="outline" onClick={() => { proceedingToNextStepRef.current = false; setIsClearCartConfirmPopupOpen(true); }} disabled={cartItems.length === 0} className="w-full sm:w-auto">
             <Trash2 className="mr-2 h-4 w-4" />
             Vaciar Carrito ({totalItems} {totalItems === 1 ? 'artículo' : 'artículos'})
           </Button>
@@ -195,11 +195,11 @@ export default function CartDisplay() {
             open={isSummaryPopupOpen}
             onOpenChange={(openState) => {
               setIsSummaryPopupOpen(openState);
-              if (!openState) {
+              if (!openState) { // Closing the dialog
                 if (proceedingToNextStepRef.current) {
-                  // If proceeding, ref will be reset after second dialog handles its closure or confirmation
+                  // If proceeding to next dialog, ref will be reset when second dialog handles its closure or confirmation
                 } else {
-                   setCurrentOrderId(null); // Cancelled first dialog directly
+                   setCurrentOrderId(null); // Cancelled first dialog directly (ESC, click outside)
                 }
               }
             }}
@@ -229,6 +229,12 @@ export default function CartDisplay() {
                           <code className="text-xs bg-muted text-muted-foreground p-1 rounded block mt-1 break-all">{`Nuevo Pedido - ID: ${currentOrderId}`}</code>
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo.</p>
+                        
+                        <hr className="my-3"/>
+                        <p className="font-semibold text-xs text-muted-foreground">RESUMEN DE TU PEDIDO (para copiar en el email):</p>
+                        <div className="max-h-[20vh] overflow-y-auto py-1 mt-1">
+                            <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
+                        </div>
                       </div>
                     </div>
 
@@ -257,13 +263,13 @@ export default function CartDisplay() {
                   </div>
                   
                   <p className="mt-6">¡Gracias por tu compra en Marivelas!</p>
-                  <hr className="my-3"/>
-                  <p className="font-semibold">RESUMEN DE TU PEDIDO (para copiar en el email):</p>
                 </div>
               </AlertDialogDescription>
-              <div className="max-h-[30vh] overflow-y-auto py-1">
+              {/* Moved the pre block into Step 1 above
+              <div className="max-h-[20vh] overflow-y-auto py-1">
                 <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
               </div>
+              */}
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={handleCancelSummaryPopup}>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={handleInstructionsAcknowledged}>Entendido, Continuar</AlertDialogAction>
@@ -272,15 +278,16 @@ export default function CartDisplay() {
           </AlertDialog>
 
           <AlertDialog open={isClearCartConfirmPopupOpen} onOpenChange={(open) => {
-            if (cartItems.length === 0 && open) {
+            if (cartItems.length === 0 && open && currentOrderId) { // if cart got emptied while this dialog was about to open for an order.
                  setIsClearCartConfirmPopupOpen(false);
+                 setCurrentOrderId(null);
                  return;
             }
             if (!open) { // Closing the dialog
-                if (!proceedingToNextStepRef.current) { // If not proceeding (i.e., cancel was clicked or ESC)
-                    setCurrentOrderId(null);
-                }
-                setIsClearCartConfirmPopupOpen(false); // Always ensure it's marked as closed
+                if (!proceedingToNextStepRef.current) { // If not proceeding from "confirm" (i.e., cancel was clicked or ESC)
+                    setCurrentOrderId(null); // Reset order ID if they cancel the final confirmation for an order
+                } // if proceedingToNextStepRef.current is true, it means "Yes, Confirm and Clear" was clicked, ID will be reset there
+                setIsClearCartConfirmPopupOpen(false);
             } else { // Opening the dialog
                 setIsClearCartConfirmPopupOpen(open);
             }
@@ -306,12 +313,15 @@ export default function CartDisplay() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => {
+                    // This is the cancel for the *second* dialog (Confirm Clear Cart)
                     setIsClearCartConfirmPopupOpen(false);
-                    setCurrentOrderId(null); // Reset order ID if they cancel the final confirmation
-                    proceedingToNextStepRef.current = false;
+                    if (currentOrderId) { // If this was a confirmation for an order...
+                        setCurrentOrderId(null); // ...reset the order ID as they are backing out.
+                    }
+                    proceedingToNextStepRef.current = false; // Ensure this is reset
                 }}>{currentOrderId ? 'No, Volver al Carrito' : 'Cancelar'}</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={currentOrderId ? handleConfirmClearCartAndFinalize : () => { clearCart(); setIsClearCartConfirmPopupOpen(false); proceedingToNextStepRef.current = false; }}
+                  onClick={currentOrderId ? handleConfirmClearCartAndFinalize : () => { clearCart(); setIsClearCartConfirmPopupOpen(false); proceedingToNextStepRef.current = false; setCurrentOrderId(null);}}
                   className={currentOrderId ? "bg-primary hover:bg-primary/90" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}
                 >
                   {currentOrderId ? 'Sí, Confirmar y Vaciar' : 'Sí, Vaciar Carrito'}
@@ -325,4 +335,3 @@ export default function CartDisplay() {
     </div>
   );
 }
-
