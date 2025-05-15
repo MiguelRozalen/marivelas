@@ -2,12 +2,12 @@
 // src/components/cart-display.tsx
 "use client";
 
-import { useContext, useState, useMemo, useEffect } from 'react';
+import { useContext, useState, useMemo } from 'react';
 import { CartContext } from '@/context/cart-context';
 import CartItem from './cart-item';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingBag, Trash2, Package, PackageCheck, Info, CheckCircle } from 'lucide-react';
+import { ShoppingBag, Trash2, Package, PackageCheck, Info, CheckCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -32,7 +32,9 @@ export default function CartDisplay() {
 
   const { toast } = useToast();
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isSummaryPopupOpen, setIsSummaryPopupOpen] = useState(false);
+  const [isClearCartConfirmPopupOpen, setIsClearCartConfirmPopupOpen] = useState(false);
+
 
   const totalItems = getItemCount();
   const subtotalValue = getSubtotal;
@@ -70,8 +72,6 @@ export default function CartDisplay() {
       summary += `Tu pedido comenzará a elaborarse una vez recibido el pago y el correo.\n`;
       summary += `¡Gracias por tu compra!\n`;
     }
-    // Removed "else if (!includeInstructions)" part as ContactForm is removed.
-
     return summary;
   };
   
@@ -80,20 +80,44 @@ export default function CartDisplay() {
   const handleProceedToCheckout = () => {
     const newOrderId = `MV-${Date.now()}`;
     setCurrentOrderId(newOrderId);
-    setIsPopupOpen(true);
+    setIsSummaryPopupOpen(true);
   };
 
-  const handleOrderInstructionsConfirmed = () => {
-    clearCart();
-    toast({
-      title: "¡Instrucciones Recibidas!",
-      description: `Tu ID de Pedido es: ${currentOrderId}. Por favor, envía ahora el correo electrónico a ${SELLER_EMAIL} con el resumen de tu pedido y este ID para finalizar la compra. Tu pedido se procesará una vez recibido el correo y el pago.`,
-      action: <CheckCircle className="h-5 w-5 text-green-500" />,
-      duration: 10000, // Longer duration for important instructions
-    });
-    setCurrentOrderId(null);
-    setIsPopupOpen(false); 
+  const handleInstructionsAcknowledged = () => {
+    setIsSummaryPopupOpen(false);
+    setIsClearCartConfirmPopupOpen(true); // Open the second confirmation popup
   };
+
+  const handleConfirmClearCartAndFinalize = () => {
+    if (currentOrderId) {
+      clearCart();
+      toast({
+        title: "¡Instrucciones de Pedido Recibidas!",
+        description: (
+          <div>
+            <p>Tu ID de Pedido es: <span className="font-semibold">{currentOrderId}</span>.</p>
+            <p className="mt-2">Por favor, envía ahora un correo electrónico a <span className="font-semibold">{SELLER_EMAIL}</span> con el resumen de tu pedido y este ID para finalizar la compra.</p>
+            <p className="mt-1">Tu pedido se procesará una vez recibido el correo y el pago.</p>
+          </div>
+        ),
+        action: <CheckCircle className="h-5 w-5 text-green-500" />,
+        duration: 15000, 
+      });
+    }
+    setIsClearCartConfirmPopupOpen(false);
+    setCurrentOrderId(null);
+  };
+
+  const handleCancelClearCart = () => {
+    setIsClearCartConfirmPopupOpen(false);
+    // setCurrentOrderId(null); // Optionally reset orderId if user cancels second popup. Keeping it for now.
+  }
+  
+  const handleCancelSummaryPopup = () => {
+    setIsSummaryPopupOpen(false);
+    setCurrentOrderId(null);
+  }
+
 
   if (cartItems.length === 0) {
     return (
@@ -154,7 +178,7 @@ export default function CartDisplay() {
         </CardHeader>
         <CardContent className="space-y-2">
             <div className="flex justify-between"><span>Subtotal:</span> <span>€{subtotalValue.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>Packaging ({packagingOption}):</span> <span>€{packagingCostValue.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Packaging ({packagingOption === 'none' || cartItems.length === 0 ? 'N/A' : packagingOption}):</span> <span>€{packagingCostValue.toFixed(2)}</span></div>
             <div className="flex justify-between"><span>Envío:</span> <span>€{shippingCostValue.toFixed(2)}</span></div>
             <Separator className="my-2" />
             <div className="flex justify-between font-bold text-lg"><span>Total Estimado:</span> <span>€{totalPriceValue.toFixed(2)}</span></div>
@@ -172,7 +196,7 @@ export default function CartDisplay() {
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto sm:ml-auto">
           <p className="text-2xl font-bold text-primary">Total: €{totalPriceValue.toFixed(2)}</p>
           
-          <AlertDialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
+          <AlertDialog open={isSummaryPopupOpen} onOpenChange={(open) => { if (!open) handleCancelSummaryPopup(); else setIsSummaryPopupOpen(open);}}>
             <AlertDialogTrigger asChild>
               <Button onClick={handleProceedToCheckout} size="lg" className="w-full sm:w-auto" disabled={cartItems.length === 0}>
                 Realizar Pedido
@@ -189,13 +213,39 @@ export default function CartDisplay() {
                 <pre className="text-sm whitespace-pre-wrap bg-muted p-4 rounded-md font-sans">{orderSummaryForPopup}</pre>
               </div>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setCurrentOrderId(null)}>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleOrderInstructionsConfirmed}>Entendido, Continuar</AlertDialogAction>
+                <AlertDialogCancel onClick={handleCancelSummaryPopup}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleInstructionsAcknowledged}>Entendido, Continuar</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          {/* Second Confirmation Dialog for Clearing Cart */}
+          <AlertDialog open={isClearCartConfirmPopupOpen} onOpenChange={(open) => { if (!open) handleCancelClearCart(); else setIsClearCartConfirmPopupOpen(open);}}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center">
+                  <AlertTriangle className="h-5 w-5 mr-2 text-destructive" />
+                  Confirmar Pedido y Vaciar Carrito
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Estás a punto de confirmar tu pedido con ID: <span className="font-semibold">{currentOrderId}</span>.
+                  Al continuar, tu carrito se vaciará y deberás seguir las instrucciones enviando un correo electrónico para completar la compra.
+                  <br/><br/>
+                  ¿Estás seguro de que quieres proceder?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={handleCancelClearCart}>No, Volver al Carrito</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmClearCartAndFinalize} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                  Sí, Confirmar y Vaciar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
         </div>
       </div>
     </div>
   );
 }
+
