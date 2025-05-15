@@ -11,8 +11,8 @@
     { "name": "Rosa Pastel", "value": "rosa-pastel-fuerte", "hexColor": "#FFD1DC" }
   ],
   "candles": [
-    { "id": "1", "name": "Sueño de Vainilla", "price": 15.99, "imageUrl": "/images/candles/sueno-de-vainilla.jpeg", "dataAiHint": "vanilla cream", "description": "Una relajante mezcla de rica vainilla y crema dulce." },
-    { "id": "2", "name": "Campos de Lavanda", "price": 18.50, "imageUrl": "/images/candles/campos-de-lavanda.jpeg", "dataAiHint": "lavender field", "description": "Lavanda calmante para relajar tus sentidos." },
+    { "id": "1", "name": "Sueño de Vainilla", "price": 15.99, "imageUrl": "/images/candles/vela1.jpg", "dataAiHint": "vanilla cream", "description": "Una relajante mezcla de rica vainilla y crema dulce." },
+    { "id": "2", "name": "Campos de Lavanda", "price": 18.50, "imageUrl": "/images/candles/vela2.jpg", "dataAiHint": "lavender field", "description": "Lavanda calmante para relajar tus sentidos." },
     { "id": "3", "name": "Explosión Cítrica", "price": 16.75, "imageUrl": "/images/candles/explosion-citrica.jpeg", "dataAiHint": "citrus burst", "description": "Una mezcla estimulante de naranja, limón y pomelo." },
     { "id": "4", "name": "Sándalo Serenidad", "price": 22.00, "imageUrl": "/images/candles/sandalo-serenidad.jpeg", "dataAiHint": "sandalwood logs", "description": "Sándalo terroso para una atmósfera tranquila." },
     { "id": "5", "name": "Felicidad de Rosa", "price": 19.99, "imageUrl": "/images/candles/felicidad-de-rosa.jpeg", "dataAiHint": "pink rose", "description": "Fragancia romántica y delicada de pétalos de rosa." },

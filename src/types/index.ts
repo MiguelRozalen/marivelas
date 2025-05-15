@@ -1,3 +1,4 @@
+
 import type { CandleColorOption } from "@/config/candle-options";
 
 export interface Candle {
@@ -14,4 +15,13 @@ export interface CartItemType {
   candle: Candle;
   color: CandleColorOption;
   quantity: number;
+}
+
+export type PackagingType = "none" | "standard" | "premium";
+
+export interface OrderCosts {
+  packagingCost: number;
+  shippingCost: number;
+  subtotal: number;
+  total: number;
 }

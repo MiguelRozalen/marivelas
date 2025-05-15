@@ -37,12 +37,9 @@ export default function CandleCard({ candle }: CandleCardProps) {
     setImageKey(prev => prev + 1);
   }, [candle.imageUrl]);
 
-  const handleImageLoadOrError = () => {
-    setIsImageLoading(false); // Stop loading whether success or handled error
-  };
-
-  const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
-    handleImageLoadOrError();
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    setIsImageLoading(false);
+    const imgElement = event.currentTarget;
     // Check naturalWidth to confirm if the image loaded successfully
     if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
       setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
@@ -51,7 +48,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
   };
   
   const handleImageError = () => { // Fallback for other types of errors
-    handleImageLoadOrError();
+    setIsImageLoading(false);
     if (effectiveImageUrl !== PLACEHOLDER_IMAGE_URL) {
       setEffectiveImageUrl(PLACEHOLDER_IMAGE_URL);
       setImageKey(prevKey => prevKey + 1);
@@ -59,7 +56,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
   };
 
   const handleAddToCart = () => {
-    addToCart(candle, selectedColor); // Quantity 1 is handled by addToCart logic
+    addToCart(candle, selectedColor); 
     toast({
       title: "¡Añadido al carrito!",
       description: `${candle.name} (Color: ${selectedColor.name}) ha sido añadido a tu carrito.`,
@@ -70,7 +67,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
       <CardHeader className="p-0">
-        <div className="aspect-[4/3] relative w-full bg-muted/50"> {/* Added bg-muted as a base for skeleton */}
+        <div className="aspect-[4/3] relative w-full bg-muted/50">
           {isImageLoading && (
             <Skeleton className="absolute inset-0 h-full w-full rounded-t-lg" />
           )}
@@ -85,9 +82,9 @@ export default function CandleCard({ candle }: CandleCardProps) {
               isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
             )}
             data-ai-hint={candle.dataAiHint}
-            onLoadingComplete={handleImageLoadingComplete}
+            onLoad={handleImageLoad}
             onError={handleImageError}
-            priority={false} // Set to true for above-the-fold images if needed
+            priority={false}
           />
         </div>
       </CardHeader>
@@ -117,13 +114,11 @@ export default function CandleCard({ candle }: CandleCardProps) {
                 <Label 
                   htmlFor={`${candle.id}-${colorOpt.value}`} 
                   className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
-                             flex items-center justify-center
                              peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
                              peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
                   style={{ backgroundColor: colorOpt.hexColor }}
                   title={colorOpt.name}
                 >
-                  {/* Checkmark icon removed */}
                 </Label>
               </div>
             ))}

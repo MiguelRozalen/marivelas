@@ -1,7 +1,8 @@
+
 // src/components/contact-form.tsx
 "use client";
 
-import { useEffect, useRef, useActionState, useTransition } from "react"; // Updated imports
+import { useEffect, useRef, useActionState, useTransition } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -21,30 +22,29 @@ const initialState: ContactFormState = {
   status: "idle",
 };
 
-// SubmitButton now takes isPending as a prop
 function SubmitButton({ isPending }: { isPending: boolean }) {
   return (
     <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
-      {isPending ? "Enviando..." : "Enviar Consulta"}
+      {isPending ? "Enviando..." : "Confirmar Envío de Pedido por Email"}
     </Button>
   );
 }
 
 interface ContactFormProps {
-  orderSummary?: string; // Optional pre-filled message for order summary
-  onFormSubmitSuccess?: () => void; // Optional callback on success
+  orderSummary: string; 
+  orderId: string;
+  onFormSubmitSuccess?: () => void;
 }
 
-export default function ContactForm({ orderSummary, onFormSubmitSuccess }: ContactFormProps) {
-  // useActionState now returns [state, formAction, isActionPending]
+export default function ContactForm({ orderSummary, orderId, onFormSubmitSuccess }: ContactFormProps) {
   const [state, formAction, isActionPending] = useActionState(submitContactForm, initialState);
-  const [, startTransition] = useTransition(); // We only need startTransition from useTransition
+  const [, startTransition] = useTransition();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
   const {
     register,
-    handleSubmit, // react-hook-form's handleSubmit
+    handleSubmit,
     formState: { errors },
     reset,
     setValue,
@@ -53,29 +53,29 @@ export default function ContactForm({ orderSummary, onFormSubmitSuccess }: Conta
     defaultValues: {
       name: "",
       email: "",
-      subject: orderSummary ? "Detalles del Pedido" : "Consulta General",
-      message: orderSummary || "",
+      subject: `Nuevo Pedido - ID: ${orderId}`,
+      message: orderSummary,
+      orderId: orderId,
     },
   });
 
-  // Update message if orderSummary prop changes (e.g. cart updates)
   useEffect(() => {
-    if (orderSummary) {
-      setValue("message", orderSummary);
-      setValue("subject", "Consulta sobre Pedido");
-    }
-  }, [orderSummary, setValue]);
+    setValue("message", orderSummary);
+    setValue("subject", `Nuevo Pedido - ID: ${orderId}`);
+    setValue("orderId", orderId);
+  }, [orderSummary, orderId, setValue]);
   
   useEffect(() => {
     if (state.status === "success") {
       toast({
         title: "¡Éxito!",
-        description: state.message,
+        description: state.message, // This message now comes from the server action with instructions.
         variant: "default",
+        duration: 10000, // Keep success message longer
         action: <CheckCircle2 className="h-5 w-5 text-green-500" />, 
       });
-      reset({ name: "", email: "", subject: orderSummary ? "Consulta sobre Pedido" : "Consulta General", message: orderSummary || "" }); 
-      formRef.current?.reset();
+      // Don't reset the form here as the user needs to copy the details.
+      // The parent component (CartDisplay) will handle clearing cart and navigation.
       if (onFormSubmitSuccess) {
         onFormSubmitSuccess();
       }
@@ -86,21 +86,21 @@ export default function ContactForm({ orderSummary, onFormSubmitSuccess }: Conta
         variant: "destructive",
       });
     }
-  }, [state, toast, reset, orderSummary, onFormSubmitSuccess]);
+  }, [state, toast, onFormSubmitSuccess]);
 
   const getFieldError = (fieldName: keyof z.infer<typeof contactFormSchema>) => {
     return state.errors?.[fieldName]?.[0] || errors[fieldName]?.message;
   };
 
-  // Wrapper for react-hook-form's handleSubmit to work with useActionState
   const handleFormSubmit: SubmitHandler<z.infer<typeof contactFormSchema>> = (data) => {
     const formData = new FormData();
+    // Ensure orderId is explicitly added if not directly part of schema/form controls in UI
+    formData.append("orderId", data.orderId || orderId); 
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         formData.append(key, String(value));
       }
     });
-    // Wrap the call to formAction in startTransition
     startTransition(() => {
       (formAction as (payload: FormData) => void)(formData);
     });
@@ -111,17 +111,18 @@ export default function ContactForm({ orderSummary, onFormSubmitSuccess }: Conta
     <Card className="max-w-2xl mx-auto shadow-lg bg-card">
       <CardHeader>
         <CardTitle className="text-2xl text-card-foreground">
-          {orderSummary ? "Completa tus Datos para el Pedido" : "Ponte en Contacto"}
+          Confirma tus Datos y Envía el Resumen del Pedido
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          {orderSummary 
-            ? "Revisa los detalles de tu pedido en el mensaje y completa tu información para enviar la consulta."
-            : "Nos encantaría saber de ti. ¡Envíanos un mensaje!"}
+          Por favor, completa tus datos de contacto. El resumen del pedido se enviará tal como se muestra.
+          Recuerda seguir las instrucciones del popup para enviar el correo y realizar el pago.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Use react-hook-form's handleSubmit */}
         <form ref={formRef} onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+          {/* Hidden input for orderId, though it's also passed in formData directly */}
+          <input type="hidden" {...register("orderId")} value={orderId} />
+          
           <div className="space-y-2">
             <Label htmlFor="name" className="text-card-foreground">Nombre Completo</Label>
             <Input id="name" placeholder="Tu Nombre" {...register("name")} aria-invalid={!!getFieldError("name")} />
@@ -135,25 +136,24 @@ export default function ContactForm({ orderSummary, onFormSubmitSuccess }: Conta
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="subject" className="text-card-foreground">Asunto</Label>
-            <Input id="subject" placeholder={orderSummary ? "Consulta sobre Pedido" : "Pregunta sobre..."} {...register("subject")} aria-invalid={!!getFieldError("subject")} />
+            <Label htmlFor="subject" className="text-card-foreground">Asunto (para tus registros)</Label>
+            <Input id="subject" {...register("subject")} aria-invalid={!!getFieldError("subject")} readOnly className="bg-muted/50" />
             {getFieldError("subject") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("subject")}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message" className="text-card-foreground">Mensaje {orderSummary ? "(Detalles del Pedido)" : ""}</Label>
+            <Label htmlFor="message" className="text-card-foreground">Resumen del Pedido (para tus registros)</Label>
             <Textarea 
               id="message" 
-              placeholder={orderSummary ? "Revisa aquí tu pedido..." : "Tu mensaje aquí..."} 
-              rows={orderSummary ? 8 : 5} 
+              rows={12} 
               {...register("message")} 
               aria-invalid={!!getFieldError("message")}
-              readOnly={!!orderSummary} // Make it read-only if pre-filled from cart
+              readOnly 
+              className="bg-muted/50"
             />
             {getFieldError("message") && <p className="text-sm text-destructive flex items-center"><AlertCircle className="h-4 w-4 mr-1" />{getFieldError("message")}</p>}
           </div>
           
-          {/* Pass isActionPending to SubmitButton */}
           <SubmitButton isPending={isActionPending} />
         </form>
       </CardContent>

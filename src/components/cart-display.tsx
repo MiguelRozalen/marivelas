@@ -1,39 +1,102 @@
+
 // src/components/cart-display.tsx
 "use client";
 
-import { useContext, useState, useMemo } from 'react';
+import { useContext, useState, useMemo, useEffect } from 'react';
 import { CartContext } from '@/context/cart-context';
 import CartItem from './cart-item';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import ContactForm from './contact-form';
-import { ShoppingBag, Trash2 } from 'lucide-react';
+import { ShoppingBag, Trash2, Package, PackageCheck, Info } from 'lucide-react';
 import Link from 'next/link';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import type { PackagingType } from '@/types';
+import { STANDARD_PACKAGING_COST, PREMIUM_PACKAGING_COST_PER_ITEM, SHIPPING_COST, SELLER_EMAIL } from '@/config/constants';
 
 export default function CartDisplay() {
-  const { cartItems, getTotalPrice, clearCart, getItemCount } = useContext(CartContext);
+  const { 
+    cartItems, 
+    getSubtotal,  // Now a number
+    getPackagingCost, // Now a number
+    getShippingCost, // Still a function
+    getTotalPrice, // Now a number
+    clearCart, 
+    getItemCount,
+    packagingOption,
+    updatePackagingOption
+  } = useContext(CartContext);
+
   const [showContactForm, setShowContactForm] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const totalItems = getItemCount();
-  const totalPrice = getTotalPrice();
+  // Direct usage of values from context
+  const subtotalValue = getSubtotal;
+  const packagingCostValue = getPackagingCost;
+  const shippingCostValue = getShippingCost(); // Call the function
+  const totalPriceValue = getTotalPrice;
 
-  const orderSummary = useMemo(() => {
-    if (cartItems.length === 0) return "";
-    let summary = "Resumen del Pedido:\n\n";
+
+  const generateOrderSummary = (orderId: string | null, includeInstructions: boolean = false) => {
+    if (cartItems.length === 0 && !orderId) return "";
+    
+    let summary = `Asunto: Nuevo Pedido - ID: ${orderId}\n\n`;
+    summary += `Estimado equipo de Marivelas,\n\n`;
+    summary += `Quisiera realizar el siguiente pedido:\n\n`;
+
     cartItems.forEach(item => {
       summary += `- ${item.candle.name} (Color: ${item.color.name}) x ${item.quantity} - €${(item.candle.price * item.quantity).toFixed(2)}\n`;
     });
-    summary += `\nTotal: €${totalPrice.toFixed(2)}`; // Currency updated to €
-    return summary;
-  }, [cartItems, totalPrice]);
 
-  const handleCheckout = () => {
+    summary += `\nSubtotal: €${subtotalValue.toFixed(2)}\n`;
+    summary += `Coste de Packaging (${packagingOption}): €${packagingCostValue.toFixed(2)}\n`;
+    summary += `Coste de Envío: €${shippingCostValue.toFixed(2)}\n`;
+    summary += `-------------------------------------\n`;
+    summary += `TOTAL DEL PEDIDO: €${totalPriceValue.toFixed(2)}\n`;
+    summary += `-------------------------------------\n\n`;
+    
+    if (includeInstructions && orderId) {
+      summary += `Mis datos de contacto son:\n`;
+      summary += `[Por favor, completa aquí tu Nombre, Email y Teléfono si es necesario]\n\n`;
+      summary += `--- Instrucciones para el Cliente ---\n`;
+      summary += `Para finalizar tu pedido, por favor, envía un correo electrónico a: ${SELLER_EMAIL}\n`;
+      summary += `1. Asunto del correo: Nuevo Pedido - ID: ${orderId} (¡Copia y pega esto!)\n`;
+      summary += `2. Cuerpo del correo: Copia y pega TODO este resumen del pedido, incluyendo tus datos de contacto.\n`;
+      summary += `3. Pago: Realiza el pago del TOTAL DEL PEDIDO (€${totalPriceValue.toFixed(2)}) por Bizum al número que te facilitaremos por correo tras recibir tu email.\n`;
+      summary += `4. Importante: Indica el ID del Pedido (${orderId}) en el concepto del Bizum.\n`;
+      summary += `Tu pedido comenzará a elaborarse una vez recibido el pago.\n`;
+      summary += `¡Gracias por tu compra!\n`;
+    } else if (!includeInstructions) {
+        summary += `Datos de Contacto:\n[Nombre del cliente]\n[Email del cliente]\n[Teléfono del cliente (opcional)]\n`;
+    }
+
+    return summary;
+  };
+  
+  const orderSummaryForPopup = useMemo(() => currentOrderId ? generateOrderSummary(currentOrderId, true) : "", [cartItems, totalPriceValue, currentOrderId, packagingOption, subtotalValue, packagingCostValue, shippingCostValue]);
+  const orderSummaryForForm = useMemo(() => currentOrderId ? generateOrderSummary(currentOrderId, false) : "", [cartItems, totalPriceValue, currentOrderId, packagingOption, subtotalValue, packagingCostValue, shippingCostValue]);
+
+
+  const handleProceedToCheckout = () => {
+    const newOrderId = `MV-${Date.now()}`;
+    setCurrentOrderId(newOrderId);
+    setIsPopupOpen(true);
+  };
+
+  const handleConfirmOrderAndShowForm = () => {
     setShowContactForm(true);
+    setIsPopupOpen(false); // Close popup after confirmation
   };
 
   const handleFormSubmitSuccess = () => {
     clearCart();
     setShowContactForm(false); 
+    setCurrentOrderId(null);
   };
 
   if (cartItems.length === 0 && !showContactForm) {
@@ -56,6 +119,55 @@ export default function CartDisplay() {
             <CartItem key={item.id} item={item} />
           ))}
           <Separator className="my-6" />
+
+          <Card className="mb-6 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-xl">Opciones de Packaging</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup
+                value={packagingOption}
+                onValueChange={(value) => updatePackagingOption(value as PackagingType)}
+                className="space-y-3"
+              >
+                <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value="standard" id="standard-packaging" />
+                  <Label htmlFor="standard-packaging" className="flex-1 cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <span><Package className="inline mr-2 h-5 w-5" />Packaging Estándar</span>
+                      <span className="font-semibold">€{STANDARD_PACKAGING_COST.toFixed(2)}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Empaquetado global para tu pedido.</p>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value="premium" id="premium-packaging" />
+                  <Label htmlFor="premium-packaging" className="flex-1 cursor-pointer">
+                     <div className="flex items-center justify-between">
+                      <span><PackageCheck className="inline mr-2 h-5 w-5" />Packaging Premium</span>
+                      <span className="font-semibold">€{PREMIUM_PACKAGING_COST_PER_ITEM.toFixed(2)} / vela</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Cada vela empaquetada individualmente con un toque especial.</p>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </CardContent>
+          </Card>
+          
+          <Card className="mb-6 shadow-md">
+             <CardHeader>
+                <CardTitle className="text-xl">Resumen de Costes</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+                <div className="flex justify-between"><span>Subtotal:</span> <span>€{subtotalValue.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Packaging ({packagingOption}):</span> <span>€{packagingCostValue.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Envío:</span> <span>€{shippingCostValue.toFixed(2)}</span></div>
+                <Separator className="my-2" />
+                <div className="flex justify-between font-bold text-lg"><span>Total Estimado:</span> <span>€{totalPriceValue.toFixed(2)}</span></div>
+                 <p className="text-xs text-muted-foreground pt-2"><Info size={14} className="inline mr-1"/>El coste de envío final puede variar ligeramente según el peso y volumen total.</p>
+            </CardContent>
+          </Card>
+
           <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow gap-4">
             <div className="w-full sm:w-auto">
               <Button variant="outline" onClick={clearCart} disabled={cartItems.length === 0} className="w-full sm:w-auto">
@@ -64,23 +176,44 @@ export default function CartDisplay() {
               </Button>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto sm:ml-auto">
-              <p className="text-2xl font-bold text-primary">Total: €{totalPrice.toFixed(2)}</p> {/* Currency updated to €, color changed to primary */}
-              <Button onClick={handleCheckout} size="lg" className="w-full sm:w-auto" disabled={cartItems.length === 0}>
-                Realizar Pedido
-              </Button>
+              <p className="text-2xl font-bold text-primary">Total: €{totalPriceValue.toFixed(2)}</p>
+              
+              <AlertDialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button onClick={handleProceedToCheckout} size="lg" className="w-full sm:w-auto" disabled={cartItems.length === 0}>
+                    Realizar Pedido
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="max-w-2xl">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmación e Instrucciones del Pedido</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tu ID de Pedido es: <span className="font-bold">{currentOrderId}</span>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="max-h-[60vh] overflow-y-auto py-4">
+                    <pre className="text-sm whitespace-pre-wrap bg-muted p-4 rounded-md font-sans">{orderSummaryForPopup}</pre>
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setCurrentOrderId(null)}>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmOrderAndShowForm}>Entendido, Continuar</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
             </div>
           </div>
         </>
       )}
 
-      {showContactForm && (
+      {showContactForm && currentOrderId && (
         <div className="mt-12">
-           {/* Removed title: <h2 className="text-2xl font-bold text-center mb-6 text-foreground">Finalizar Pedido</h2> */}
           <ContactForm 
-            orderSummary={orderSummary} 
+            orderSummary={orderSummaryForForm}
+            orderId={currentOrderId} 
             onFormSubmitSuccess={handleFormSubmitSuccess}
           />
-          <Button variant="outline" onClick={() => setShowContactForm(false)} className="mt-6 mx-auto block">
+          <Button variant="outline" onClick={() => {setShowContactForm(false); setCurrentOrderId(null);}} className="mt-6 mx-auto block">
             Volver al Carrito
           </Button>
         </div>

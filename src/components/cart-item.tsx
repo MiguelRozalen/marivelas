@@ -28,16 +28,13 @@ export default function CartItem({ item }: CartItemProps) {
 
   useEffect(() => {
     setEffectiveImageUrl(item.candle.imageUrl);
-    setIsImageLoading(true); // Start loading when item.candle.imageUrl changes
+    setIsImageLoading(true);
     setImageKey(prev => prev + 1);
   }, [item.candle.imageUrl]);
 
-  const handleImageLoadOrError = () => {
-    setIsImageLoading(false); // Stop loading whether success or handled error
-  };
-
-  const handleImageLoadingComplete = (imgElement: HTMLImageElement) => {
-    handleImageLoadOrError();
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    setIsImageLoading(false);
+    const imgElement = event.currentTarget;
     if (imgElement.naturalWidth === 0 && effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
       setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
       setImageKey(prevKey => prevKey + 1);
@@ -45,7 +42,7 @@ export default function CartItem({ item }: CartItemProps) {
   };
   
   const handleImageError = () => {
-    handleImageLoadOrError();
+    setIsImageLoading(false);
     if (effectiveImageUrl !== PLACEHOLDER_CART_IMAGE_URL) {
       setEffectiveImageUrl(PLACEHOLDER_CART_IMAGE_URL);
       setImageKey(prevKey => prevKey + 1);
@@ -59,7 +56,7 @@ export default function CartItem({ item }: CartItemProps) {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b bg-card rounded-lg shadow mb-4 gap-4">
       <div className="flex items-center gap-4 w-full sm:w-auto">
-        <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden bg-muted/50"> {/* Added bg-muted for skeleton base */}
+        <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-md overflow-hidden bg-muted/50">
           {isImageLoading && (
             <Skeleton className="absolute inset-0 h-full w-full" />
           )}
@@ -74,7 +71,7 @@ export default function CartItem({ item }: CartItemProps) {
               isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
             )}
             data-ai-hint={item.candle.dataAiHint}
-            onLoadingComplete={handleImageLoadingComplete}
+            onLoad={handleImageLoad}
             onError={handleImageError}
           />
         </div>
