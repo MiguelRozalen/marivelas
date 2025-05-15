@@ -151,7 +151,7 @@ Por favor, asegúrate de completar todos los pasos.
         title: "Error al Copiar",
         description: "No se pudieron copiar las instrucciones. Por favor, inténtalo manualmente.",
         variant: "destructive",
-        action: <AlertTriangle className="h-5 w-5" />, // Assuming AlertTriangle is already imported/available
+        action: <AlertTriangle className="h-5 w-5" />,
       });
       console.error('Failed to copy instructions: ', err);
     }
@@ -305,14 +305,14 @@ Por favor, asegúrate de completar todos los pasos.
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Removed thank you message from here */}
                 </div>
               </AlertDialogDescription>
-              <AlertDialogFooter>
-                <Button variant="outline" onClick={handleCopyInstructions}>Copiar Instrucciones</Button>
-                <AlertDialogCancel onClick={handleCancelSummaryPopup}>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleInstructionsAcknowledged}>Entendido, Continuar</AlertDialogAction>
+              <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-between">
+                <AlertDialogCancel onClick={handleCancelSummaryPopup} className="sm:mr-auto">Cancelar</AlertDialogCancel>
+                <div className="flex flex-col sm:flex-row gap-2 mt-2 sm:mt-0">
+                    <Button variant="outline" onClick={handleCopyInstructions}>Copiar Instrucciones</Button>
+                    <AlertDialogAction onClick={handleInstructionsAcknowledged}>Entendido, Continuar</AlertDialogAction>
+                </div>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -374,4 +374,3 @@ Por favor, asegúrate de completar todos los pasos.
     </div>
   );
 }
-
