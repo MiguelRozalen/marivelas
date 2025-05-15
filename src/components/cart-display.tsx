@@ -274,8 +274,7 @@ Por favor, asegúrate de completar todos los pasos.
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">Cuerpo del correo: Copia y pega TODO el resumen del pedido que se muestra abajo.</p>
                         
-                        <hr className="my-3"/>
-                        <p className="font-semibold text-xs text-muted-foreground">RESUMEN DE TU PEDIDO (para copiar en el email):</p>
+                        {/* Removed HR and "Resumen de tu pedido" text */}
                         <div className="max-h-[20vh] overflow-y-auto py-1 mt-1">
                             <pre className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-md font-sans">{orderEmailBodyForPopup}</pre>
                         </div>
@@ -374,3 +373,4 @@ Por favor, asegúrate de completar todos los pasos.
     </div>
   );
 }
+
