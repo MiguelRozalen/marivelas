@@ -36,9 +36,10 @@ interface CarouselImageItemProps {
   onLoad?: () => void;
   onError?: () => void;
   objectFit?: 'cover' | 'contain';
+  aspectRatio: ImageCarouselProps['aspectRatio'];
 }
 
-function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onLoad, onError, objectFit = 'cover' }: CarouselImageItemProps) {
+function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onLoad, onError, objectFit = 'cover', aspectRatio }: CarouselImageItemProps) {
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
@@ -68,6 +69,7 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, on
     <div 
       className={cn(
         "relative w-full h-full", 
+        aspectRatio,
         objectFit === 'cover' ? 'bg-muted/50' : 'bg-transparent'
       )}
     >
@@ -120,8 +122,8 @@ export default function ImageCarousel({
     return (
         <div 
           className={cn(
-            "w-full", 
-            aspectRatio, 
+            "w-full h-full relative",
+            aspectRatio,
             onImageClick && "cursor-pointer",
             objectFit === 'cover' ? 'bg-muted/50' : 'bg-transparent'
           )}
@@ -143,7 +145,7 @@ export default function ImageCarousel({
       >
         <CarouselContent className="h-full">
           {imageUrls.map((url, index) => (
-            <CarouselItem key={index} className={cn(aspectRatio, "relative h-full")} onClick={(e) => handleContainerClick(e, index)}>
+            <CarouselItem key={index} className="relative h-full w-full flex items-center justify-center" onClick={(e) => handleContainerClick(e, index)}>
                <CarouselImageItem
                 src={url}
                 altText={altText}
@@ -151,6 +153,7 @@ export default function ImageCarousel({
                 placeholderUrl={fallbackPlaceholder}
                 index={index}
                 objectFit={objectFit}
+                aspectRatio={aspectRatio}
                 onLoad={index === 0 ? onImageLoad : undefined} // Only trigger onLoad for the first image
                 onError={index === 0 ? onImageLoad : undefined} // Also trigger onLoad on error to prevent infinite loading
               />
