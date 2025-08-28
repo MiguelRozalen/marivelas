@@ -76,7 +76,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             onImageLoad={onImageLoad}
           />
         </CardHeader>
-        <div className="p-4 flex flex-col flex-grow">
+        <div className="p-5 flex flex-col flex-grow">
           <CardTitle className="text-xl font-semibold text-card-foreground">{candle.name}</CardTitle>
           <CardContent className="p-0 pt-3 flex flex-col flex-grow">
             <div className="space-y-4 flex-grow">
@@ -91,7 +91,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                     optionType="color"
                     uniqueIdPrefix={`${candle.id}-color`}
                 />
-                <span className="text-sm font-medium" style={colorNameStyle}>{selectedColor.name}</span>
+                <span className="text-sm font-medium italic" style={colorNameStyle}>{selectedColor.name}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
@@ -104,11 +104,11 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                     optionType="scent"
                     uniqueIdPrefix={`${candle.id}-scent`}
                 />
-                <span className="text-sm font-medium" style={scentNameStyle}>{selectedScent.name}</span>
+                <span className="text-sm font-medium italic" style={scentNameStyle}>{selectedScent.name}</span>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="mt-4 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
               <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
                 <ShoppingCart className="mr-2 h-5 w-5" />
