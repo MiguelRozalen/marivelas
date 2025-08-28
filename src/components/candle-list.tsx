@@ -20,8 +20,8 @@ interface CandleListProps {
 const PageLoaderSkeleton = () => (
   <Card className="flex flex-col overflow-hidden shadow-lg bg-card h-full">
       <Skeleton className="h-[300px] w-full" />
-      <CardContent className="p-6 flex-grow space-y-6">
-          <Skeleton className="h-6 w-3/4" />
+      <CardContent className="p-6 flex-grow space-y-4">
+          <Skeleton className="h-6 w-3/4 mb-2" />
           <div className="space-y-2">
               <Skeleton className="h-4 w-1/3" />
               <div className="flex flex-wrap gap-3">
@@ -106,7 +106,7 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
         {candles.map(candle => (
           <CandleCardLoader key={candle.id} candle={candle} />
         ))}
