@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, CheckCircle } from 'lucide-react';
 import ImageCarousel from './image-carousel';
 import ImageZoom from './image-zoom';
-import { cn } from '@/lib/utils';
+import { cn, isColorLight } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CandleCardProps {
@@ -50,6 +50,10 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
     setIsZoomOpen(false);
   }
 
+  // Determine text color based on contrast
+  const colorNameStyle = !isColorLight(selectedColor.hexColor) ? { color: selectedColor.hexColor } : {};
+  const scentNameStyle = !isColorLight(selectedScent.hexColor) ? { color: selectedScent.hexColor } : {};
+
   return (
     <TooltipProvider>
       <ImageZoom 
@@ -78,7 +82,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
           <div className="mt-4 space-y-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Color: <span className="font-semibold" style={{color: selectedColor.hexColor}}>{selectedColor.name}</span>
+                Color: <span className="font-semibold" style={colorNameStyle}>{selectedColor.name}</span>
               </Label>
               <RadioGroup
                 value={selectedColor.value}
@@ -118,7 +122,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             </div>
             <div>
                <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Aroma: <span className="font-semibold" style={{color: selectedScent.hexColor}}>{selectedScent.name}</span>
+                Aroma: <span className="font-semibold" style={scentNameStyle}>{selectedScent.name}</span>
               </Label>
               <RadioGroup
                 value={selectedScent.value}
@@ -169,3 +173,5 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
     </TooltipProvider>
   );
 }
+
+    
