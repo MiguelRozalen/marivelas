@@ -107,7 +107,12 @@ export default function ImageCarousel({
 
   return (
     <div className="relative w-full">
-      <Carousel className="w-full">
+      <Carousel 
+        className="w-full"
+        opts={{
+          loop: true,
+        }}
+      >
         <CarouselContent>
           {imageUrls.map((url, index) => (
             <CarouselItem key={index} className={cn(aspectRatio, "relative")}>
