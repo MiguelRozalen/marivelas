@@ -40,21 +40,33 @@ export default function CartItem({ item }: CartItemProps) {
           </Link>
           <div className="flex items-center my-1">
             <span className="text-sm text-muted-foreground mr-2">Color:</span>
-            <span 
-              className="h-5 w-5 rounded-full border" 
-              style={{ backgroundColor: item.color.hexColor }}
-              title={item.color.name}
-            ></span>
-            <span className="ml-2 text-sm text-muted-foreground">{item.color.name}</span>
+            {item.color ? (
+              <>
+                <span 
+                  className="h-5 w-5 rounded-full border" 
+                  style={{ backgroundColor: item.color.hexColor }}
+                  title={item.color.name}
+                ></span>
+                <span className="ml-2 text-sm text-muted-foreground">{item.color.name}</span>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground italic">No especificado</span>
+            )}
           </div>
           <div className="flex items-center my-1">
             <span className="text-sm text-muted-foreground mr-2">Aroma:</span>
-            <span 
-              className="h-5 w-5 rounded-full border" 
-              style={{ backgroundColor: item.scent.hexColor }}
-              title={item.scent.name}
-            ></span>
-            <span className="ml-2 text-sm text-muted-foreground">{item.scent.name}</span>
+            {item.scent ? (
+              <>
+                <span 
+                  className="h-5 w-5 rounded-full border" 
+                  style={{ backgroundColor: item.scent.hexColor }}
+                  title={item.scent.name}
+                ></span>
+                <span className="ml-2 text-sm text-muted-foreground">{item.scent.name}</span>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground italic">No especificado</span>
+            )}
           </div>
           <p className="text-sm text-muted-foreground">Precio unitario: €{item.candle.price.toFixed(2)}</p>
         </div>
