@@ -13,13 +13,16 @@ import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, CheckCircle } from 'lucide-react';
 import ImageCarousel from './image-carousel';
-import ImageZoom from './image-zoom'; // Import the new zoom component
+import ImageZoom from './image-zoom';
+import { cn } from '@/lib/utils';
 
 interface CandleCardProps {
   candle: Candle;
+  onImageLoad?: () => void;
+  className?: string;
 }
 
-export default function CandleCard({ candle }: CandleCardProps) {
+export default function CandleCard({ candle, onImageLoad, className }: CandleCardProps) {
   const [selectedColor, setSelectedColor] = useState<CandleColorOption>(AVAILABLE_CANDLE_COLORS[0]);
   const [zoomStartIndex, setZoomStartIndex] = useState<number>(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
@@ -55,7 +58,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
         open={isZoomOpen}
         onOpenChange={handleZoomClose}
       />
-      <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
+      <Card className={cn("flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card", className)}>
         <CardHeader className="p-0">
           <ImageCarousel
             imageUrls={candle.imageUrls}
@@ -64,6 +67,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
             aspectRatio="aspect-[4/3]"
             placeholderDimensions="400x300"
             onImageClick={handleImageClick}
+            onImageLoad={onImageLoad}
           />
         </CardHeader>
         <CardContent className="p-6 flex-grow">

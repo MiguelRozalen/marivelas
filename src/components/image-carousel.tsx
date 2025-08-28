@@ -2,18 +2,15 @@
 "use client";
 
 import NextImage from 'next/image';
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "@/components/ui/carousel";
-import { useState, useEffect } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 interface ImageCarouselProps {
   imageUrls: string[];
@@ -23,6 +20,7 @@ interface ImageCarouselProps {
   placeholderBaseUrl?: string;
   placeholderDimensions?: string;
   onImageClick?: (index: number) => void;
+  onImageLoad?: () => void; // Callback for when the primary image loads
   initialIndex?: number;
   objectFit?: 'cover' | 'contain';
 }
@@ -35,49 +33,46 @@ interface CarouselImageItemProps {
   dataAiHint?: string;
   placeholderUrl: string;
   index: number;
+  onLoad?: () => void;
+  onError?: () => void;
   objectFit?: 'cover' | 'contain';
 }
 
-function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, objectFit = 'cover' }: CarouselImageItemProps) {
+function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onLoad, onError, objectFit = 'cover' }: CarouselImageItemProps) {
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
   const [isImageLoading, setIsImageLoading] = useState(true);
-  const [imageKey, setImageKey] = useState(0);
 
   useEffect(() => {
     setEffectiveImageUrl(src);
     setIsImageLoading(true);
-    setImageKey(prev => prev + 1);
   }, [src]);
-
-  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  
+  const handleLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setIsImageLoading(false);
     const imgElement = event.currentTarget;
     if (imgElement.naturalWidth === 0 && effectiveImageUrl !== placeholderUrl) {
       setEffectiveImageUrl(placeholderUrl);
-      setImageKey(prevKey => prevKey + 1);
     }
+    onLoad?.();
   };
 
-  const handleImageError = () => {
+  const handleError = () => {
     setIsImageLoading(false);
     if (effectiveImageUrl !== placeholderUrl) {
       setEffectiveImageUrl(placeholderUrl);
-      setImageKey(prevKey => prevKey + 1);
     }
+    onError?.();
   };
   
   return (
     <div 
       className={cn(
         "relative w-full h-full", 
-        objectFit === 'cover' && 'bg-muted/50'
+        objectFit === 'cover' ? 'bg-muted/50' : 'bg-transparent'
       )}
     >
-      {isImageLoading && (
-        <Skeleton className="absolute inset-0 h-full w-full" />
-      )}
       <NextImage
-        key={`${altText}-carousel-${index}-${imageKey}`}
+        key={`${altText}-carousel-${index}-${effectiveImageUrl}`}
         src={effectiveImageUrl}
         alt={`${altText} - view ${index + 1}`}
         fill
@@ -88,8 +83,8 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, ob
           isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
         )}
         data-ai-hint={dataAiHint}
-        onLoad={handleImageLoad}
-        onError={handleImageError}
+        onLoad={handleLoad}
+        onError={handleError}
         priority={index === 0}
       />
     </div>
@@ -105,6 +100,7 @@ export default function ImageCarousel({
   placeholderBaseUrl = "https://placehold.co/",
   placeholderDimensions = "400x300",
   onImageClick,
+  onImageLoad,
   initialIndex = 0,
   objectFit = 'cover',
 }: ImageCarouselProps) {
@@ -113,7 +109,6 @@ export default function ImageCarousel({
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>, index?: number) => {
     if (!onImageClick) return;
 
-    // Check if the click target is one of the carousel navigation buttons or their child elements.
     if ((e.target as HTMLElement).closest('[data-embla-button="prev"]') || (e.target as HTMLElement).closest('[data-embla-button="next"]')) {
       return;
     }
@@ -128,11 +123,11 @@ export default function ImageCarousel({
             "w-full", 
             aspectRatio, 
             onImageClick && "cursor-pointer",
-            objectFit === 'cover' && 'bg-muted/50'
+            objectFit === 'cover' ? 'bg-muted/50' : 'bg-transparent'
           )}
           onClick={(e) => handleContainerClick(e)}
         >
-            <NextImage src={fallbackPlaceholder} alt={altText} fill className={objectFit === 'cover' ? 'object-cover' : 'object-contain'} data-ai-hint={dataAiHint} />
+            <NextImage src={fallbackPlaceholder} alt={altText} fill className={objectFit === 'cover' ? 'object-cover' : 'object-contain'} data-ai-hint={dataAiHint} onLoad={onImageLoad}/>
         </div>
     );
   }
@@ -142,7 +137,7 @@ export default function ImageCarousel({
       <Carousel 
         className={cn("w-full h-full", onImageClick && "cursor-pointer")}
         opts={{
-          loop: true,
+          loop: imageUrls.length > 1,
           startIndex: initialIndex,
         }}
       >
@@ -156,6 +151,8 @@ export default function ImageCarousel({
                 placeholderUrl={fallbackPlaceholder}
                 index={index}
                 objectFit={objectFit}
+                onLoad={index === 0 ? onImageLoad : undefined} // Only trigger onLoad for the first image
+                onError={index === 0 ? onImageLoad : undefined} // Also trigger onLoad on error to prevent infinite loading
               />
             </CarouselItem>
           ))}

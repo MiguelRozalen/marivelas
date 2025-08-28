@@ -3,10 +3,10 @@
 "use client";
 
 import type { Candle } from '@/types';
-import CandleCard from './candle-card';
+import CandleCardLoader from './candle-card-loader'; // Changed from CandleCard to CandleCardLoader
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchCandles } from '@/lib/actions';
-import { getCandlePageSize } from '@/config/pagination'; // Updated import
+import { getCandlePageSize } from '@/config/pagination';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -15,7 +15,8 @@ interface CandleListProps {
   totalCandles: number;
 }
 
-const CandleSkeleton = () => (
+// This is now the skeleton shown when fetching the next page of candles.
+const PageLoaderSkeleton = () => (
   <div className="flex flex-col space-y-3">
     <Skeleton className="h-[250px] w-full rounded-xl" />
     <div className="space-y-2">
@@ -36,7 +37,7 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialCandles.length < totalCandles);
   const loaderRef = useRef<HTMLDivElement | null>(null);
-  const PAGE_SIZE = getCandlePageSize(); // Get page size from the config
+  const PAGE_SIZE = getCandlePageSize();
 
   const loadMoreCandles = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -53,11 +54,10 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
       }
     } catch (error) {
       console.error("Failed to fetch more candles:", error);
-      // Optionally, set an error state and display a message to the user
     } finally {
       setIsLoading(false);
     }
-  }, [offset, isLoading, hasMore, totalCandles]); // PAGE_SIZE removed as it's constant from getCandlePageSize scope
+  }, [offset, isLoading, hasMore, totalCandles]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -66,7 +66,7 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
           loadMoreCandles();
         }
       },
-      { threshold: 1.0 } // Trigger when loader is fully visible
+      { threshold: 1.0 }
     );
 
     const currentLoaderRef = loaderRef.current;
@@ -81,7 +81,6 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
     };
   }, [loadMoreCandles]);
   
-  // Initial check in case initialCandles already cover totalCandles
   useEffect(() => {
     setHasMore(candles.length < totalCandles);
   }, [candles.length, totalCandles]);
@@ -91,9 +90,9 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {candles.map(candle => (
-          <CandleCard key={candle.id} candle={candle} />
+          <CandleCardLoader key={candle.id} candle={candle} />
         ))}
-        {isLoading && Array.from({ length: PAGE_SIZE / 2 || 3 }).map((_, index) => <CandleSkeleton key={`skeleton-${index}`} />)}
+        {isLoading && Array.from({ length: PAGE_SIZE / 2 || 3 }).map((_, index) => <PageLoaderSkeleton key={`skeleton-${index}`} />)}
       </div>
       <div ref={loaderRef} className="flex justify-center items-center py-8">
         {hasMore && !isLoading && (
