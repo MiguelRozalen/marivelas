@@ -24,6 +24,7 @@ interface ImageCarouselProps {
   placeholderDimensions?: string;
   onImageClick?: (index: number) => void;
   initialIndex?: number;
+  objectFit?: 'cover' | 'contain';
 }
 
 const DEFAULT_PLACEHOLDER_URL = "https://placehold.co/400x300.png";
@@ -35,9 +36,10 @@ interface CarouselImageItemProps {
   placeholderUrl: string;
   index: number;
   onClick?: (index: number) => void;
+  objectFit?: 'cover' | 'contain';
 }
 
-function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onClick }: CarouselImageItemProps) {
+function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onClick, objectFit = 'cover' }: CarouselImageItemProps) {
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageKey, setImageKey] = useState(0);
@@ -80,7 +82,8 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, on
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         className={cn(
-          "object-cover w-full h-full",
+          "w-full h-full",
+          objectFit === 'cover' ? 'object-cover' : 'object-contain',
           isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
         )}
         data-ai-hint={dataAiHint}
@@ -102,6 +105,7 @@ export default function ImageCarousel({
   placeholderDimensions = "400x300",
   onImageClick,
   initialIndex = 0,
+  objectFit = 'cover',
 }: ImageCarouselProps) {
   const fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
 
@@ -114,7 +118,7 @@ export default function ImageCarousel({
           className={cn("w-full bg-muted/50", aspectRatio, onImageClick && "cursor-pointer")}
           onClick={handleClick}
         >
-            <NextImage src={fallbackPlaceholder} alt={altText} fill className="object-cover" data-ai-hint={dataAiHint} />
+            <NextImage src={fallbackPlaceholder} alt={altText} fill className={objectFit === 'cover' ? 'object-cover' : 'object-contain'} data-ai-hint={dataAiHint} />
         </div>
     );
   }
@@ -138,6 +142,7 @@ export default function ImageCarousel({
                 placeholderUrl={fallbackPlaceholder}
                 index={index}
                 onClick={onImageClick}
+                objectFit={objectFit}
               />
             </CarouselItem>
           ))}

@@ -1,3 +1,4 @@
+
 // src/components/image-zoom.tsx
 "use client";
 
@@ -37,6 +38,7 @@ export default function ImageZoom({ imageUrls, startIndex, altText, dataAiHint, 
                         aspectRatio="aspect-video"
                         placeholderDimensions="1200x800"
                         initialIndex={startIndex}
+                        objectFit="contain" // Use object-contain for the zoom view
                     />
                 </div>
             </DialogContent>
