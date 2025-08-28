@@ -46,7 +46,7 @@ export default function CartItem({ item }: CartItemProps) {
       />
       <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b bg-card rounded-lg shadow mb-4 gap-4">
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted/50 cursor-pointer">
+          <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted/50 cursor-pointer flex-shrink-0">
             <ImageCarousel
               imageUrls={item.candle.imageUrls}
               altText={item.candle.name}
