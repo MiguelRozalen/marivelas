@@ -69,7 +69,11 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, on
   
   return (
     <div 
-      className={cn("relative w-full h-full bg-muted/50", onClick && "cursor-pointer")}
+      className={cn(
+        "relative w-full h-full", 
+        onClick && "cursor-pointer",
+        objectFit === 'cover' && 'bg-muted/50'
+      )}
       onClick={() => onClick?.(index)}
     >
       {isImageLoading && (
@@ -115,7 +119,12 @@ export default function ImageCarousel({
     }
     return (
         <div 
-          className={cn("w-full bg-muted/50", aspectRatio, onImageClick && "cursor-pointer")}
+          className={cn(
+            "w-full", 
+            aspectRatio, 
+            onImageClick && "cursor-pointer",
+            objectFit === 'cover' && 'bg-muted/50'
+          )}
           onClick={handleClick}
         >
             <NextImage src={fallbackPlaceholder} alt={altText} fill className={objectFit === 'cover' ? 'object-cover' : 'object-contain'} data-ai-hint={dataAiHint} />
