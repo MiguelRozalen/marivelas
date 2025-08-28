@@ -47,7 +47,7 @@ const CartSkeleton = () => (
 
     {/* Skeleton for Packaging Card */}
     <Card className="mb-6 shadow-md">
-      <CardHeader className="p-4">
+      <CardHeader className="p-4 pb-0">
         <Skeleton className="h-6 w-48" />
       </CardHeader>
       <CardContent className="p-4 space-y-4">
@@ -70,7 +70,7 @@ const CartSkeleton = () => (
 
     {/* Skeleton for Cost Summary Card */}
     <Card className="mb-6 shadow-md">
-       <CardHeader className="p-4">
+       <CardHeader className="p-4 pb-0">
             <Skeleton className="h-6 w-40" />
         </CardHeader>
         <CardContent className="p-4 space-y-3">
@@ -259,7 +259,7 @@ Por favor, asegúrate de completar todos los pasos.
       <Separator className="my-6" />
 
       <Card className="mb-6 shadow-md">
-        <CardHeader className="p-4">
+        <CardHeader className="p-4 pb-0">
           <CardTitle className="text-xl">Opciones de Packaging</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
@@ -293,7 +293,7 @@ Por favor, asegúrate de completar todos los pasos.
       </Card>
 
       <Card className="mb-6 shadow-md">
-         <CardHeader className="p-4">
+         <CardHeader className="p-4 pb-0">
             <CardTitle className="text-xl">Resumen de Costes</CardTitle>
         </CardHeader>
         <CardContent className="p-4 space-y-2">
