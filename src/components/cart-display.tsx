@@ -259,10 +259,10 @@ Por favor, asegúrate de completar todos los pasos.
       <Separator className="my-6" />
 
       <Card className="mb-6 shadow-md">
-        <CardHeader className="p-4 pb-0">
+        <CardHeader className="p-6 pb-0">
           <CardTitle className="text-xl">Opciones de Packaging</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-6 pt-4">
           <RadioGroup
             value={packagingOption}
             onValueChange={(value) => updatePackagingOption(value as PackagingType)}
@@ -293,10 +293,10 @@ Por favor, asegúrate de completar todos los pasos.
       </Card>
 
       <Card className="mb-6 shadow-md">
-         <CardHeader className="p-4 pb-0">
+         <CardHeader className="p-6 pb-0">
             <CardTitle className="text-xl">Resumen de Costes</CardTitle>
         </CardHeader>
-        <CardContent className="p-4 space-y-2">
+        <CardContent className="p-6 pt-4 space-y-2">
             <div className="flex justify-between"><span>Subtotal:</span> <span>€{subtotalValue.toFixed(2)}</span></div>
             <div className="flex justify-between"><span>Packaging ({packagingOption === 'none' || cartItems.length === 0 ? 'N/A' : packagingOption}):</span> <span>€{packagingCostValue.toFixed(2)}</span></div>
             <div className="flex justify-between"><span>Envío:</span> <span>€{shippingCostValue.toFixed(2)}</span></div>
@@ -306,7 +306,7 @@ Por favor, asegúrate de completar todos los pasos.
         </CardContent>
       </Card>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow-md gap-4">
         <div className="w-full sm:w-auto">
           <Button variant="outline" onClick={() => { proceedingToNextStepRef.current = false; setIsClearCartConfirmPopupOpen(true); }} disabled={cartItems.length === 0} className="w-full sm:w-auto">
             <Trash2 className="mr-2 h-4 w-4" />
