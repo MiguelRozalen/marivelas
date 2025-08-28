@@ -81,7 +81,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
           
           <div className="mt-4 space-y-4">
             <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
                 Color:
               </Label>
               <OptionSelector
@@ -94,7 +94,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
               <span className="text-sm font-semibold" style={colorNameStyle}>{selectedColor.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
                 Aroma:
               </Label>
                <OptionSelector
