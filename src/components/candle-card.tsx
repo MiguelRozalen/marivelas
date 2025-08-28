@@ -5,7 +5,6 @@
 import type { Candle } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { AVAILABLE_CANDLE_COLORS, AVAILABLE_CANDLE_SCENTS, type CandleColorOption, type CandleScentOption } from '@/config/candle-options';
 import { useState, useContext } from 'react';
@@ -15,7 +14,8 @@ import { ShoppingCart, CheckCircle } from 'lucide-react';
 import ImageCarousel from './image-carousel';
 import ImageZoom from './image-zoom';
 import { cn, isColorLight } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import OptionSelector from './option-selector';
 
 interface CandleCardProps {
   candle: Candle;
@@ -84,81 +84,25 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Color: <span className="font-semibold" style={colorNameStyle}>{selectedColor.name}</span>
               </Label>
-              <RadioGroup
-                value={selectedColor.value}
-                onValueChange={(value) => {
-                  const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
-                  if (color) setSelectedColor(color);
-                }}
-                className="flex flex-wrap gap-3"
-                aria-label={`Opciones de color para ${candle.name}`}
-              >
-                {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
-                  <Tooltip key={colorOpt.value}>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <RadioGroupItem 
-                          value={colorOpt.value} 
-                          id={`${candle.id}-color-${colorOpt.value}`} 
-                          className="sr-only peer"
-                          aria-label={colorOpt.name}
-                        />
-                        <Label 
-                          htmlFor={`${candle.id}-color-${colorOpt.value}`} 
-                          className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
-                                     peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
-                                     peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
-                          style={{ backgroundColor: colorOpt.hexColor }}
-                        >
-                        </Label>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{colorOpt.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </RadioGroup>
+              <OptionSelector
+                  options={AVAILABLE_CANDLE_COLORS}
+                  selectedOption={selectedColor}
+                  onSelectOption={setSelectedColor}
+                  optionType="color"
+                  uniqueIdPrefix={`${candle.id}-color`}
+              />
             </div>
             <div>
-               <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Aroma: <span className="font-semibold" style={scentNameStyle}>{selectedScent.name}</span>
               </Label>
-              <RadioGroup
-                value={selectedScent.value}
-                onValueChange={(value) => {
-                  const scent = AVAILABLE_CANDLE_SCENTS.find(s => s.value === value);
-                  if (scent) setSelectedScent(scent);
-                }}
-                className="flex flex-wrap gap-3"
-                aria-label={`Opciones de aroma para ${candle.name}`}
-              >
-                {AVAILABLE_CANDLE_SCENTS.map((scentOpt: CandleScentOption) => (
-                  <Tooltip key={scentOpt.value}>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <RadioGroupItem 
-                          value={scentOpt.value} 
-                          id={`${candle.id}-scent-${scentOpt.value}`} 
-                          className="sr-only peer"
-                          aria-label={scentOpt.name}
-                        />
-                        <Label 
-                          htmlFor={`${candle.id}-scent-${scentOpt.value}`} 
-                          className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
-                                     peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
-                                     peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
-                          style={{ backgroundColor: scentOpt.hexColor }}
-                        >
-                        </Label>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{scentOpt.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </RadioGroup>
+               <OptionSelector
+                  options={AVAILABLE_CANDLE_SCENTS}
+                  selectedOption={selectedScent}
+                  onSelectOption={setSelectedScent}
+                  optionType="scent"
+                  uniqueIdPrefix={`${candle.id}-scent`}
+              />
             </div>
           </div>
         </CardContent>
@@ -173,5 +117,3 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
     </TooltipProvider>
   );
 }
-
-    
