@@ -11,13 +11,13 @@
     { "name": "Rosa Pastel", "value": "rosa-pastel-fuerte", "hexColor": "#FFD1DC" }
   ],
   "candles": [
-    { "id": "1", "name": "Amor Perruno", "price": 10,"imageUrls": ["/images/candles/amorperruno_1.jpeg"], "dataAiHint": "vanilla cream", "description": "Una relajante mezcla de rica vainilla y crema dulce." },
-    { "id": "2", "name": "Infinito y Más Allá", "price": 8.50, "imageUrls": ["/images/candles/InfinitoyMasAlla_1.jpeg", "/images/candles/InfinitoyMasAlla_2.jpeg"], "dataAiHint": "lavender field", "description": "Vainilla calmante para teletransportarte."},
-    { "id": "3", "name": "Home", "price": 10, "imageUrls": ["/images/candles/home.jpeg","/images/candles/home2.jpeg"], "dataAiHint": "citrus burst", "description": "Una mezcla estimulante de naranja, limón y pomelo." },
-    { "id": "4", "name": "Luna lunera", "price": 9.00, "imageUrls": ["/images/candles/lunalunera_1.jpeg","/images/candles/lunalunera_2.jpeg"], "dataAiHint": "sandalwood logs", "description": "Sándalo terroso para una atmósfera tranquila." },
-    { "id": "5", "name": "Felicidad de Rosa", "price": 5.00, "imageUrls": ["/images/candles/rosa.jpeg"], "dataAiHint": "pink rose", "description": "Fragancia romántica y delicada de pétalos de rosa." },
-    { "id": "6", "name": "Belleza", "price": 10.50, "imageUrls": ["/images/candles/belleza.jpeg"], "dataAiHint": "ocean wave", "description": "Fresco y vigorizante, como un paseo junto al mar." },
-    { "id": "7", "name": "Bosque Encantado", "price": 11.50, "imageUrls": ["/images/candles/bosque.jpeg"], "dataAiHint": "enchanted forest", "description": "Aroma fresco de pino y musgo de roble." },
-    { "id": "8", "name": "Gatuno", "price": 9.50, "imageUrls": ["/images/candles/gatuno_1.jpeg", "/images/candles/gatuno_2.jpeg"], "dataAiHint": "coconut palm", "description": "Dulce coco tropical con un toque de vainilla." }
+    { "id": "1", "name": "Amor Perruno", "price": 10,"imageUrls": ["/images/candles/amorperruno_1.jpeg"], "dataAiHint": "vanilla cream" },
+    { "id": "2", "name": "Infinito y Más Allá", "price": 8.50, "imageUrls": ["/images/candles/InfinitoyMasAlla_1.jpeg", "/images/candles/InfinitoyMasAlla_2.jpeg"], "dataAiHint": "lavender field" },
+    { "id": "3", "name": "Home", "price": 10, "imageUrls": ["/images/candles/home.jpeg","/images/candles/home2.jpeg"], "dataAiHint": "citrus burst" },
+    { "id": "4", "name": "Luna lunera", "price": 9.00, "imageUrls": ["/images/candles/lunalunera_1.jpeg","/images/candles/lunalunera_2.jpeg"], "dataAiHint": "sandalwood logs" },
+    { "id": "5", "name": "Felicidad de Rosa", "price": 5.00, "imageUrls": ["/images/candles/rosa.jpeg"], "dataAiHint": "pink rose" },
+    { "id": "6", "name": "Belleza", "price": 10.50, "imageUrls": ["/images/candles/belleza.jpeg"], "dataAiHint": "ocean wave" },
+    { "id": "7", "name": "Bosque Encantado", "price": 11.50, "imageUrls": ["/images/candles/bosque.jpeg"], "dataAiHint": "enchanted forest" },
+    { "id": "8", "name": "Gatuno", "price": 9.50, "imageUrls": ["/images/candles/gatuno_1.jpeg", "/images/candles/gatuno_2.jpeg"], "dataAiHint": "coconut palm" }
   ]
 }

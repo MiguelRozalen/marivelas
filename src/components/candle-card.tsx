@@ -72,7 +72,6 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
         </CardHeader>
         <CardContent className="p-6 flex-grow">
           <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
-          {candle.description && <CardDescription className="text-muted-foreground mb-4 text-sm">{candle.description}</CardDescription>}
           
           <div className="mt-4">
             <Label className="text-sm font-medium text-muted-foreground mb-2 block">Selecciona un color:</Label>
