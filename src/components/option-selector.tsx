@@ -8,13 +8,13 @@ import {
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import type { CandleColorOption, CandleScentOption } from '@/config/candle-options';
+import { ChevronDown } from 'lucide-react';
 
 type Option = CandleColorOption | CandleScentOption;
 
@@ -54,22 +54,22 @@ export default function OptionSelector<T extends Option>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              size="icon"
-              className="h-6 w-6 rounded-full flex items-center justify-center p-0"
+              size="sm"
+              className="h-auto rounded-full flex items-center justify-center p-1 gap-1"
               aria-label={`Seleccionar ${optionType}`}
             >
               <OptionCircle option={selectedOption} />
+              <ChevronDown className="h-4 w-4 opacity-60" />
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Cambiar {optionType}</p>
+          <p>Cambiar {optionType === 'color' ? 'Color' : 'Aroma'}</p>
         </TooltipContent>
       </Tooltip>
 
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Selecciona un {optionType}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        {/* The DropdownMenuLabel has been removed as requested */}
         <DropdownMenuRadioGroup value={selectedOption.value} onValueChange={handleValueChange}>
           {options.map((option) => (
             <DropdownMenuRadioItem key={option.value} value={option.value} className="flex items-center gap-2 cursor-pointer">
