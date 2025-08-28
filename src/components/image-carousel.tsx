@@ -68,27 +68,28 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, on
   return (
     <div 
       className={cn(
-        "relative w-full h-full", 
-        aspectRatio,
+        "relative w-full h-full",
         objectFit === 'cover' ? 'bg-muted/50' : 'bg-transparent'
       )}
     >
-      <NextImage
-        key={`${altText}-carousel-${index}-${effectiveImageUrl}`}
-        src={effectiveImageUrl}
-        alt={`${altText} - view ${index + 1}`}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className={cn(
-          "w-full h-full",
-          objectFit === 'cover' ? 'object-cover' : 'object-contain',
-          isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
-        )}
-        data-ai-hint={dataAiHint}
-        onLoad={handleLoad}
-        onError={handleError}
-        priority={index === 0}
-      />
+      <div className={cn("relative w-full h-full", aspectRatio)}>
+        <NextImage
+          key={`${altText}-carousel-${index}-${effectiveImageUrl}`}
+          src={effectiveImageUrl}
+          alt={`${altText} - view ${index + 1}`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className={cn(
+            "w-full h-full",
+            objectFit === 'cover' ? 'object-cover' : 'object-contain',
+            isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out"
+          )}
+          data-ai-hint={dataAiHint}
+          onLoad={handleLoad}
+          onError={handleError}
+          priority={index === 0}
+        />
+      </div>
     </div>
   );
 }
@@ -135,7 +136,7 @@ export default function ImageCarousel({
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full flex items-center">
       <Carousel 
         className={cn("w-full h-full", onImageClick && "cursor-pointer")}
         opts={{
