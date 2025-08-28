@@ -22,7 +22,8 @@ interface ImageCarouselProps {
   aspectRatio?: "aspect-video" | "aspect-square" | "aspect-[4/3]" | "aspect-[3/4]" | "aspect-[16/9]";
   placeholderBaseUrl?: string;
   placeholderDimensions?: string;
-  onImageClick?: (imageUrl: string) => void; // New prop for click handler
+  onImageClick?: (index: number) => void;
+  initialIndex?: number;
 }
 
 const DEFAULT_PLACEHOLDER_URL = "https://placehold.co/400x300.png";
@@ -33,7 +34,7 @@ interface CarouselImageItemProps {
   dataAiHint?: string;
   placeholderUrl: string;
   index: number;
-  onClick?: (imageUrl: string) => void;
+  onClick?: (index: number) => void;
 }
 
 function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onClick }: CarouselImageItemProps) {
@@ -67,7 +68,7 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, on
   return (
     <div 
       className={cn("relative w-full h-full bg-muted/50", onClick && "cursor-pointer")}
-      onClick={() => onClick?.(effectiveImageUrl)}
+      onClick={() => onClick?.(index)}
     >
       {isImageLoading && (
         <Skeleton className="absolute inset-0 h-full w-full" />
@@ -99,15 +100,19 @@ export default function ImageCarousel({
   aspectRatio = "aspect-[4/3]",
   placeholderBaseUrl = "https://placehold.co/",
   placeholderDimensions = "400x300",
-  onImageClick // Destructure new prop
+  onImageClick,
+  initialIndex = 0,
 }: ImageCarouselProps) {
   const fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
 
   if (!imageUrls || imageUrls.length === 0) {
+    const handleClick = () => {
+      if (onImageClick) onImageClick(0);
+    }
     return (
         <div 
           className={cn("w-full bg-muted/50", aspectRatio, onImageClick && "cursor-pointer")}
-          onClick={() => onImageClick?.(fallbackPlaceholder)}
+          onClick={handleClick}
         >
             <NextImage src={fallbackPlaceholder} alt={altText} fill className="object-cover" data-ai-hint={dataAiHint} />
         </div>
@@ -115,23 +120,24 @@ export default function ImageCarousel({
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full h-full">
       <Carousel 
-        className="w-full"
+        className="w-full h-full"
         opts={{
           loop: true,
+          startIndex: initialIndex,
         }}
       >
-        <CarouselContent>
+        <CarouselContent className="h-full">
           {imageUrls.map((url, index) => (
-            <CarouselItem key={index} className={cn(aspectRatio, "relative")}>
+            <CarouselItem key={index} className={cn(aspectRatio, "relative h-full")}>
                <CarouselImageItem
                 src={url}
                 altText={altText}
                 dataAiHint={dataAiHint}
                 placeholderUrl={fallbackPlaceholder}
                 index={index}
-                onClick={onImageClick} // Pass handler to item
+                onClick={onImageClick}
               />
             </CarouselItem>
           ))}

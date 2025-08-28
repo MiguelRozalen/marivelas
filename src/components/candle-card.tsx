@@ -21,7 +21,7 @@ interface CandleCardProps {
 
 export default function CandleCard({ candle }: CandleCardProps) {
   const [selectedColor, setSelectedColor] = useState<CandleColorOption>(AVAILABLE_CANDLE_COLORS[0]);
-  const [zoomedImageUrl, setZoomedImageUrl] = useState<string | null>(null);
+  const [zoomStartIndex, setZoomStartIndex] = useState<number>(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   const { addToCart } = useContext(CartContext);
@@ -36,22 +36,22 @@ export default function CandleCard({ candle }: CandleCardProps) {
     });
   };
 
-  const handleImageClick = (imageUrl: string) => {
-    setZoomedImageUrl(imageUrl);
+  const handleImageClick = (index: number) => {
+    setZoomStartIndex(index);
     setIsZoomOpen(true);
   };
   
   const handleZoomClose = () => {
     setIsZoomOpen(false);
-    // Optional: delay clearing the image to prevent flicker during closing animation
-    setTimeout(() => setZoomedImageUrl(null), 300);
   }
 
   return (
     <>
       <ImageZoom 
-        imageUrl={zoomedImageUrl}
+        imageUrls={candle.imageUrls}
+        startIndex={zoomStartIndex}
         altText={`Zoom de ${candle.name}`}
+        dataAiHint={candle.dataAiHint}
         open={isZoomOpen}
         onOpenChange={handleZoomClose}
       />
@@ -63,7 +63,7 @@ export default function CandleCard({ candle }: CandleCardProps) {
             dataAiHint={candle.dataAiHint}
             aspectRatio="aspect-[4/3]"
             placeholderDimensions="400x300"
-            onImageClick={handleImageClick} // Pass the handler
+            onImageClick={handleImageClick}
           />
         </CardHeader>
         <CardContent className="p-6 flex-grow">
