@@ -50,7 +50,7 @@ export default function CartDisplay() {
     summary += `Quisiera realizar el siguiente pedido con ID: ${orderId}\n\n`;
 
     cartItems.forEach(item => {
-      summary += `- ${item.candle.name} (Color: ${item.color.name}) x ${item.quantity} - €${(item.candle.price * item.quantity).toFixed(2)}\n`;
+      summary += `- ${item.candle.name} (Color: ${item.color.name}, Aroma: ${item.scent.name}) x ${item.quantity} - €${(item.candle.price * item.quantity).toFixed(2)}\n`;
     });
 
     summary += `\nSubtotal: €${subtotalValue.toFixed(2)}\n`;
@@ -372,4 +372,3 @@ Por favor, asegúrate de completar todos los pasos.
     </div>
   );
 }
-

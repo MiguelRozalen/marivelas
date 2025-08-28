@@ -10,6 +10,14 @@
     { "name": "Negro Ónix", "value": "negro-onix", "hexColor": "#1f2937" },
     { "name": "Rosa Pastel", "value": "rosa-pastel-fuerte", "hexColor": "#FFD1DC" }
   ],
+  "availableScents": [
+    { "name": "Vainilla", "value": "vainilla", "hexColor": "#f3e5ab" },
+    { "name": "Lavanda", "value": "lavanda", "hexColor": "#e6e6fa" },
+    { "name": "Canela", "value": "canela", "hexColor": "#d2691e" },
+    { "name": "Frutos Rojos", "value": "frutos-rojos", "hexColor": "#dc143c" },
+    { "name": "Jazmín", "value": "jazmin", "hexColor": "#f8f8ff" },
+    { "name": "Sin Aroma", "value": "sin-aroma", "hexColor": "#f5f5f5" }
+  ],
   "candles": [
     { "id": "1", "name": "Amor Perruno", "price": 10,"imageUrls": ["/images/candles/amorperruno_1.jpeg"], "dataAiHint": "vanilla cream" },
     { "id": "2", "name": "Infinito y Más Allá", "price": 8.50, "imageUrls": ["/images/candles/InfinitoyMasAlla_1.jpeg", "/images/candles/InfinitoyMasAlla_2.jpeg"], "dataAiHint": "lavender field" },

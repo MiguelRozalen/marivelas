@@ -1,5 +1,5 @@
 
-import type { CandleColorOption } from "@/config/candle-options";
+import type { CandleColorOption, CandleScentOption } from "@/config/candle-options";
 
 export interface Candle {
   id: string;
@@ -7,13 +7,13 @@ export interface Candle {
   price: number;
   imageUrls: string[]; // Changed from imageUrl to imageUrls
   dataAiHint: string;
-  description?: string;
 }
 
 export interface CartItemType {
   id: string; // Unique ID for the cart item, e.g., candle.id + color.value
   candle: Candle;
   color: CandleColorOption;
+  scent: CandleScentOption;
   quantity: number;
 }
 

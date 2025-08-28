@@ -7,4 +7,11 @@ export interface CandleColorOption {
   hexColor: string; // Hex color code for display, e.g., "#dc2626"
 }
 
+export interface CandleScentOption {
+  name: string;
+  value: string;
+  hexColor: string;
+}
+
 export const AVAILABLE_CANDLE_COLORS: CandleColorOption[] = catalogData.availableColors;
+export const AVAILABLE_CANDLE_SCENTS: CandleScentOption[] = catalogData.availableScents;

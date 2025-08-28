@@ -3,14 +3,15 @@
 "use client";
 
 import type { Candle, CartItemType, PackagingType } from '@/types';
-import type { CandleColorOption } from '@/config/candle-options';
+import type { CandleColorOption, CandleScentOption } from '@/config/candle-options';
 import React, { createContext, useState, ReactNode, useEffect, useMemo } from 'react';
 import { STANDARD_PACKAGING_COST, PREMIUM_PACKAGING_COST_PER_ITEM, SHIPPING_COST } from '@/config/constants';
+import { AVAILABLE_CANDLE_SCENTS } from '@/config/candle-options';
 
 interface CartContextType {
   cartItems: CartItemType[];
   packagingOption: PackagingType;
-  addToCart: (candle: Candle, color: CandleColorOption) => void;
+  addToCart: (candle: Candle, color: CandleColorOption, scent: CandleScentOption) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   updatePackagingOption: (option: PackagingType) => void;
@@ -75,9 +76,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, [cartItems, packagingOption, isCartLoaded]);
 
-  const addToCart = (candle: Candle, color: CandleColorOption) => {
+  const addToCart = (candle: Candle, color: CandleColorOption, scent: CandleScentOption) => {
     setCartItems(prevItems => {
-      const itemId = `${candle.id}-${color.value}`;
+      const itemId = `${candle.id}-${color.value}-${scent.value}`;
       const existingItem = prevItems.find(item => item.id === itemId);
       if (existingItem) {
         return prevItems.map(item =>
@@ -86,7 +87,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             : item
         );
       }
-      return [...prevItems, { id: itemId, candle, color, quantity: 1 }];
+      return [...prevItems, { id: itemId, candle, color, scent, quantity: 1 }];
     });
   };
 
