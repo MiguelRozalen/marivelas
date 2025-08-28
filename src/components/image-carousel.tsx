@@ -138,7 +138,7 @@ export default function ImageCarousel({
   return (
     <div className="relative w-full h-full flex items-center">
       <Carousel 
-        className={cn("w-full h-full", onImageClick && "cursor-pointer")}
+        className={cn("w-full h-full", onImageClick && "cursor-pointer", objectFit === 'cover' ? '' : 'flex')}
         opts={{
           loop: imageUrls.length > 1,
           startIndex: initialIndex,
