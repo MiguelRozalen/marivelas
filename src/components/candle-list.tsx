@@ -1,3 +1,4 @@
+
 // src/components/candle-list.tsx
 "use client";
 
