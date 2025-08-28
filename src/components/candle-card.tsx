@@ -3,7 +3,7 @@
 "use client";
 
 import type { Candle } from '@/types';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from "@/components/ui/label";
 import { AVAILABLE_CANDLE_COLORS, AVAILABLE_CANDLE_SCENTS, type CandleColorOption, type CandleScentOption } from '@/config/candle-options';
@@ -76,10 +76,10 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             onImageLoad={onImageLoad}
           />
         </CardHeader>
-        <CardContent className="p-6 flex-grow">
+        <CardContent className="p-6 flex flex-col flex-grow">
           <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
           
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-4 flex-grow">
             <div className="flex items-center gap-2">
               <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
                 Color:
@@ -107,14 +107,15 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
               <span className="text-sm font-semibold" style={scentNameStyle}>{selectedScent.name}</span>
             </div>
           </div>
+
+          <div className="mt-6 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
+            <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
+              <ShoppingCart className="mr-2 h-5 w-5" />
+              Agregar al Carrito
+            </Button>
+          </div>
         </CardContent>
-        <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
-          <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
-            <ShoppingCart className="mr-2 h-5 w-5" />
-            Agregar al Carrito
-          </Button>
-        </CardFooter>
       </Card>
     </TooltipProvider>
   );
