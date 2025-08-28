@@ -80,9 +80,9 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
           <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
           
           <div className="mt-4 space-y-4">
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Color: <span className="font-semibold" style={colorNameStyle}>{selectedColor.name}</span>
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                Color:
               </Label>
               <OptionSelector
                   options={AVAILABLE_CANDLE_COLORS}
@@ -91,10 +91,11 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                   optionType="color"
                   uniqueIdPrefix={`${candle.id}-color`}
               />
+              <span className="text-sm font-semibold" style={colorNameStyle}>{selectedColor.name}</span>
             </div>
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Aroma: <span className="font-semibold" style={scentNameStyle}>{selectedScent.name}</span>
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                Aroma:
               </Label>
                <OptionSelector
                   options={AVAILABLE_CANDLE_SCENTS}
@@ -103,6 +104,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                   optionType="scent"
                   uniqueIdPrefix={`${candle.id}-scent`}
               />
+              <span className="text-sm font-semibold" style={scentNameStyle}>{selectedScent.name}</span>
             </div>
           </div>
         </CardContent>
