@@ -47,10 +47,10 @@ const CartSkeleton = () => (
 
     {/* Skeleton for Packaging Card */}
     <Card className="mb-6 shadow-md">
-      <CardHeader>
+      <CardHeader className="p-4">
         <Skeleton className="h-6 w-48" />
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="p-4 space-y-4">
         <div className="flex items-center space-x-3 p-3 border rounded-md">
           <Skeleton className="h-5 w-5 rounded-full" />
           <div className="flex-1 space-y-2">
@@ -70,10 +70,10 @@ const CartSkeleton = () => (
 
     {/* Skeleton for Cost Summary Card */}
     <Card className="mb-6 shadow-md">
-       <CardHeader>
+       <CardHeader className="p-4">
             <Skeleton className="h-6 w-40" />
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="p-4 space-y-3">
             <div className="flex justify-between"><Skeleton className="h-5 w-24" /> <Skeleton className="h-5 w-16" /></div>
             <div className="flex justify-between"><Skeleton className="h-5 w-32" /> <Skeleton className="h-5 w-16" /></div>
             <div className="flex justify-between"><Skeleton className="h-5 w-20" /> <Skeleton className="h-5 w-16" /></div>
@@ -259,10 +259,10 @@ Por favor, asegúrate de completar todos los pasos.
       <Separator className="my-6" />
 
       <Card className="mb-6 shadow-md">
-        <CardHeader>
+        <CardHeader className="p-4">
           <CardTitle className="text-xl">Opciones de Packaging</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <RadioGroup
             value={packagingOption}
             onValueChange={(value) => updatePackagingOption(value as PackagingType)}
@@ -293,10 +293,10 @@ Por favor, asegúrate de completar todos los pasos.
       </Card>
 
       <Card className="mb-6 shadow-md">
-         <CardHeader>
+         <CardHeader className="p-4">
             <CardTitle className="text-xl">Resumen de Costes</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="p-4 space-y-2">
             <div className="flex justify-between"><span>Subtotal:</span> <span>€{subtotalValue.toFixed(2)}</span></div>
             <div className="flex justify-between"><span>Packaging ({packagingOption === 'none' || cartItems.length === 0 ? 'N/A' : packagingOption}):</span> <span>€{packagingCostValue.toFixed(2)}</span></div>
             <div className="flex justify-between"><span>Envío:</span> <span>€{shippingCostValue.toFixed(2)}</span></div>
@@ -453,5 +453,7 @@ Por favor, asegúrate de completar todos los pasos.
     </div>
   );
 }
+
+    
 
     
