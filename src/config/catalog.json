@@ -22,7 +22,7 @@
     { "id": "1", "name": "Amor Perruno", "price": 10,"imageUrls": ["/images/candles/amorperruno_1.jpeg"], "dataAiHint": "vanilla cream" },
     { "id": "2", "name": "Infinito y Más Allá", "price": 8.50, "imageUrls": ["/images/candles/InfinitoyMasAlla_1.jpeg", "/images/candles/InfinitoyMasAlla_2.jpeg"], "dataAiHint": "lavender field" },
     { "id": "3", "name": "Home", "price": 10, "imageUrls": ["/images/candles/home.jpeg","/images/candles/home2.jpeg"], "dataAiHint": "citrus burst" },
-    { "id": "4", "name": "Luna lunera", "price": 9.00, "imageUrls": ["/images/candles/lunalunera_1.jpeg","/images/candles/lunalunera_2.jpeg"], "dataAiHint": "sandalwood logs" },
+    { "id": "4", "name": "Luna Lunera", "price": 9.00, "imageUrls": ["/images/candles/lunalunera_1.jpeg","/images/candles/lunalunera_2.jpeg"], "dataAiHint": "sandalwood logs" },
     { "id": "5", "name": "Felicidad de Rosa", "price": 5.00, "imageUrls": ["/images/candles/rosa.jpeg"], "dataAiHint": "pink rose" },
     { "id": "6", "name": "Belleza", "price": 10.50, "imageUrls": ["/images/candles/belleza.jpeg"], "dataAiHint": "ocean wave" },
     { "id": "7", "name": "Bosque Encantado", "price": 11.50, "imageUrls": ["/images/candles/bosque.jpeg"], "dataAiHint": "enchanted forest" },
