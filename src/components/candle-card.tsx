@@ -65,7 +65,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
         onOpenChange={handleZoomClose}
       />
       <Card className={cn("flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card h-full", className)}>
-        <CardHeader className="p-0">
+        <CardHeader className="p-0 relative">
           <ImageCarousel
             imageUrls={candle.imageUrls}
             altText={candle.name}
@@ -76,46 +76,47 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             onImageLoad={onImageLoad}
           />
         </CardHeader>
-        <CardContent className="p-6 flex flex-col flex-grow">
-          <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
-          
-          <div className="mt-4 space-y-4 flex-grow">
-            <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
-                Color:
-              </Label>
-              <OptionSelector
-                  options={AVAILABLE_CANDLE_COLORS}
-                  selectedOption={selectedColor}
-                  onSelectOption={setSelectedColor}
-                  optionType="color"
-                  uniqueIdPrefix={`${candle.id}-color`}
-              />
-              <span className="text-sm font-semibold" style={colorNameStyle}>{selectedColor.name}</span>
+        <div className="p-4 flex flex-col flex-grow">
+          <CardTitle className="text-xl font-semibold text-card-foreground">{candle.name}</CardTitle>
+          <CardContent className="p-0 pt-3 flex flex-col flex-grow">
+            <div className="space-y-4 flex-grow">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
+                  Color:
+                </Label>
+                <OptionSelector
+                    options={AVAILABLE_CANDLE_COLORS}
+                    selectedOption={selectedColor}
+                    onSelectOption={setSelectedColor}
+                    optionType="color"
+                    uniqueIdPrefix={`${candle.id}-color`}
+                />
+                <span className="text-sm font-medium" style={colorNameStyle}>{selectedColor.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
+                  Aroma:
+                </Label>
+                 <OptionSelector
+                    options={AVAILABLE_CANDLE_SCENTS}
+                    selectedOption={selectedScent}
+                    onSelectOption={setSelectedScent}
+                    optionType="scent"
+                    uniqueIdPrefix={`${candle.id}-scent`}
+                />
+                <span className="text-sm font-medium" style={scentNameStyle}>{selectedScent.name}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
-                Aroma:
-              </Label>
-               <OptionSelector
-                  options={AVAILABLE_CANDLE_SCENTS}
-                  selectedOption={selectedScent}
-                  onSelectOption={setSelectedScent}
-                  optionType="scent"
-                  uniqueIdPrefix={`${candle.id}-scent`}
-              />
-              <span className="text-sm font-semibold" style={scentNameStyle}>{selectedScent.name}</span>
-            </div>
-          </div>
 
-          <div className="mt-6 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
-            <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Agregar al Carrito
-            </Button>
-          </div>
-        </CardContent>
+            <div className="mt-6 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+              <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
+              <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Agregar al Carrito
+              </Button>
+            </div>
+          </CardContent>
+        </div>
       </Card>
     </TooltipProvider>
   );
