@@ -16,6 +16,83 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import type { PackagingType } from '@/types';
 import { STANDARD_PACKAGING_COST, PREMIUM_PACKAGING_COST_PER_ITEM, SHIPPING_COST, SELLER_EMAIL } from '@/config/constants';
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from './ui/skeleton';
+
+const CartSkeleton = () => (
+  <div>
+    {/* Skeleton for 2 cart items */}
+    {[...Array(2)].map((_, i) => (
+      <div key={`skel-item-${i}`} className="flex flex-col sm:flex-row items-center justify-between p-4 border-b bg-card rounded-lg shadow mb-4 gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <Skeleton className="h-24 w-24 rounded-md flex-shrink-0" />
+          <div className="flex-grow space-y-2">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        <div className="flex flex-row items-center justify-between w-full mt-4 sm:mt-0 sm:w-auto sm:justify-end sm:gap-6 gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-16" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
+          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-10 w-10" />
+        </div>
+      </div>
+    ))}
+    <Separator className="my-6" />
+
+    {/* Skeleton for Packaging Card */}
+    <Card className="mb-6 shadow-md">
+      <CardHeader>
+        <Skeleton className="h-6 w-48" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center space-x-3 p-3 border rounded-md">
+          <Skeleton className="h-5 w-5 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-1/2" />
+            <Skeleton className="h-3 w-3/4" />
+          </div>
+        </div>
+        <div className="flex items-center space-x-3 p-3 border rounded-md">
+          <Skeleton className="h-5 w-5 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-1/2" />
+            <Skeleton className="h-3 w-3/4" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Skeleton for Cost Summary Card */}
+    <Card className="mb-6 shadow-md">
+       <CardHeader>
+            <Skeleton className="h-6 w-40" />
+        </CardHeader>
+        <CardContent className="space-y-3">
+            <div className="flex justify-between"><Skeleton className="h-5 w-24" /> <Skeleton className="h-5 w-16" /></div>
+            <div className="flex justify-between"><Skeleton className="h-5 w-32" /> <Skeleton className="h-5 w-16" /></div>
+            <div className="flex justify-between"><Skeleton className="h-5 w-20" /> <Skeleton className="h-5 w-16" /></div>
+            <Separator className="my-2" />
+            <div className="flex justify-between"><Skeleton className="h-6 w-28" /> <Skeleton className="h-6 w-20" /></div>
+        </CardContent>
+    </Card>
+
+    {/* Skeleton for Footer actions */}
+     <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-card rounded-lg shadow gap-4">
+        <Skeleton className="h-10 w-44" />
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto sm:ml-auto">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-12 w-40" />
+        </div>
+      </div>
+  </div>
+);
+
 
 export default function CartDisplay() {
   const {
@@ -27,7 +104,8 @@ export default function CartDisplay() {
     clearCart,
     getItemCount,
     packagingOption,
-    updatePackagingOption
+    updatePackagingOption,
+    isCartLoaded
   } = useContext(CartContext);
 
   const { toast } = useToast();
@@ -157,6 +235,9 @@ Por favor, asegúrate de completar todos los pasos.
     }
   };
 
+  if (!isCartLoaded) {
+    return <CartSkeleton />;
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -372,3 +453,5 @@ Por favor, asegúrate de completar todos los pasos.
     </div>
   );
 }
+
+    
