@@ -78,7 +78,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
           <div className="mt-4 space-y-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Color: <span className="font-semibold text-card-foreground">{selectedColor.name}</span>
+                Color: <span className="font-semibold" style={{color: selectedColor.hexColor}}>{selectedColor.name}</span>
               </Label>
               <RadioGroup
                 value={selectedColor.value}
@@ -118,7 +118,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             </div>
             <div>
                <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Aroma: <span className="font-semibold text-card-foreground">{selectedScent.name}</span>
+                Aroma: <span className="font-semibold" style={{color: selectedScent.hexColor}}>{selectedScent.name}</span>
               </Label>
               <RadioGroup
                 value={selectedScent.value}
