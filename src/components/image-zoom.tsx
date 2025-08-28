@@ -24,6 +24,10 @@ export default function ImageZoom({ imageUrls, startIndex, altText, dataAiHint, 
     // We need a unique key to force remounting the carousel, so it starts at the correct index.
     const carouselKey = `${altText}-zoom-${startIndex}-${imageUrls.join('-')}`;
 
+    const handleClose = () => {
+        onOpenChange(false);
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent 
@@ -39,6 +43,7 @@ export default function ImageZoom({ imageUrls, startIndex, altText, dataAiHint, 
                         placeholderDimensions="1200x800"
                         initialIndex={startIndex}
                         objectFit="contain" // Use object-contain for the zoom view
+                        onImageClick={handleClose}
                     />
                 </div>
             </DialogContent>

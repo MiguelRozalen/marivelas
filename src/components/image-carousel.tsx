@@ -35,11 +35,10 @@ interface CarouselImageItemProps {
   dataAiHint?: string;
   placeholderUrl: string;
   index: number;
-  onClick?: (index: number) => void;
   objectFit?: 'cover' | 'contain';
 }
 
-function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onClick, objectFit = 'cover' }: CarouselImageItemProps) {
+function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, objectFit = 'cover' }: CarouselImageItemProps) {
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageKey, setImageKey] = useState(0);
@@ -71,10 +70,8 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, on
     <div 
       className={cn(
         "relative w-full h-full", 
-        onClick && "cursor-pointer",
         objectFit === 'cover' && 'bg-muted/50'
       )}
-      onClick={() => onClick?.(index)}
     >
       {isImageLoading && (
         <Skeleton className="absolute inset-0 h-full w-full" />
@@ -113,10 +110,18 @@ export default function ImageCarousel({
 }: ImageCarouselProps) {
   const fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
 
-  if (!imageUrls || imageUrls.length === 0) {
-    const handleClick = () => {
-      if (onImageClick) onImageClick(0);
+  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>, index?: number) => {
+    if (!onImageClick) return;
+
+    // Check if the click target is one of the carousel navigation buttons or their child elements.
+    if ((e.target as HTMLElement).closest('[data-embla-button="prev"]') || (e.target as HTMLElement).closest('[data-embla-button="next"]')) {
+      return;
     }
+    
+    onImageClick(index ?? 0);
+  };
+
+  if (!imageUrls || imageUrls.length === 0) {
     return (
         <div 
           className={cn(
@@ -125,7 +130,7 @@ export default function ImageCarousel({
             onImageClick && "cursor-pointer",
             objectFit === 'cover' && 'bg-muted/50'
           )}
-          onClick={handleClick}
+          onClick={(e) => handleContainerClick(e)}
         >
             <NextImage src={fallbackPlaceholder} alt={altText} fill className={objectFit === 'cover' ? 'object-cover' : 'object-contain'} data-ai-hint={dataAiHint} />
         </div>
@@ -135,7 +140,7 @@ export default function ImageCarousel({
   return (
     <div className="relative w-full h-full">
       <Carousel 
-        className="w-full h-full"
+        className={cn("w-full h-full", onImageClick && "cursor-pointer")}
         opts={{
           loop: true,
           startIndex: initialIndex,
@@ -143,14 +148,13 @@ export default function ImageCarousel({
       >
         <CarouselContent className="h-full">
           {imageUrls.map((url, index) => (
-            <CarouselItem key={index} className={cn(aspectRatio, "relative h-full")}>
+            <CarouselItem key={index} className={cn(aspectRatio, "relative h-full")} onClick={(e) => handleContainerClick(e, index)}>
                <CarouselImageItem
                 src={url}
                 altText={altText}
                 dataAiHint={dataAiHint}
                 placeholderUrl={fallbackPlaceholder}
                 index={index}
-                onClick={onImageClick}
                 objectFit={objectFit}
               />
             </CarouselItem>
@@ -158,8 +162,8 @@ export default function ImageCarousel({
         </CarouselContent>
         {imageUrls.length > 1 && (
           <>
-            <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/70 hover:bg-background/90 text-foreground" />
-            <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/70 hover:bg-background/90 text-foreground" />
+            <CarouselPrevious data-embla-button="prev" className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/70 hover:bg-background/90 text-foreground" />
+            <CarouselNext data-embla-button="next" className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/70 hover:bg-background/90 text-foreground" />
           </>
         )}
       </Carousel>
