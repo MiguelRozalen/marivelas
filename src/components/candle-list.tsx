@@ -3,31 +3,49 @@
 "use client";
 
 import type { Candle } from '@/types';
-import CandleCardLoader from './candle-card-loader'; // Changed from CandleCard to CandleCardLoader
+import CandleCardLoader from './candle-card-loader'; 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchCandles } from '@/lib/actions';
 import { getCandlePageSize } from '@/config/pagination';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 
 interface CandleListProps {
   initialCandles: Candle[];
   totalCandles: number;
 }
 
-// This is now the skeleton shown when fetching the next page of candles.
+// This skeleton now matches the structure of the updated CandleCardLoader skeleton
 const PageLoaderSkeleton = () => (
-  <div className="flex flex-col space-y-3">
-    <Skeleton className="h-[250px] w-full rounded-xl" />
-    <div className="space-y-2">
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="h-4 w-1/2" />
-    </div>
-    <div className="flex justify-between items-center pt-2">
-      <Skeleton className="h-8 w-1/4" />
-      <Skeleton className="h-10 w-2/5" />
-    </div>
-  </div>
+  <Card className="flex flex-col overflow-hidden shadow-lg bg-card h-full">
+      <Skeleton className="h-[300px] w-full" />
+      <CardContent className="p-6 flex-grow space-y-6">
+          <Skeleton className="h-6 w-3/4" />
+          <div className="space-y-2">
+              <Skeleton className="h-4 w-1/3" />
+              <div className="flex flex-wrap gap-3">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
+              </div>
+          </div>
+          <div className="space-y-2">
+              <Skeleton className="h-4 w-1/3" />
+              <div className="flex flex-wrap gap-3">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-5 w-5 rounded-full" />
+              </div>
+          </div>
+      </CardContent>
+      <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <Skeleton className="h-8 w-1/4" />
+          <Skeleton className="h-10 w-2/5" />
+      </CardFooter>
+  </Card>
 );
 
 
