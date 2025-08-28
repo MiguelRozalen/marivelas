@@ -1,11 +1,13 @@
 
+// src/components/candle-card-loader.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Candle } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import CandleCard from './candle-card';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import NextImage from 'next/image';
 
 interface CandleCardLoaderProps {
   candle: Candle;
@@ -13,11 +15,10 @@ interface CandleCardLoaderProps {
 
 const CandleCardSkeleton = () => (
     <Card className="flex flex-col overflow-hidden shadow-lg bg-card h-full">
-        <Skeleton className="h-[300px] w-full" />
+        <Skeleton className="aspect-[4/3] w-full" />
         <CardContent className="p-6 flex-grow space-y-4">
             <Skeleton className="h-6 w-3/4 mb-2" />
             
-            {/* Skeleton for Color Selector */}
             <div className="space-y-2">
                 <Skeleton className="h-4 w-1/3" />
                 <div className="flex flex-wrap gap-3">
@@ -28,7 +29,6 @@ const CandleCardSkeleton = () => (
                 </div>
             </div>
 
-            {/* Skeleton for Scent Selector */}
             <div className="space-y-2">
                 <Skeleton className="h-4 w-1/3" />
                 <div className="flex flex-wrap gap-3">
@@ -46,27 +46,32 @@ const CandleCardSkeleton = () => (
     </Card>
 );
 
-
 export default function CandleCardLoader({ candle }: CandleCardLoaderProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const primaryImageUrl = candle.imageUrls?.[0] || '/placeholder.png';
 
-  const handleImageLoad = () => {
-    setIsLoaded(true);
-  };
+  useEffect(() => {
+    // This effect preloads the image.
+    // The `Image` component from Next.js is used here because it's optimized for this.
+    // We render it hidden (`display: 'none'`) so it doesn't affect layout.
+    const img = new window.Image();
+    img.src = primaryImageUrl;
+    img.onload = () => setIsLoaded(true);
+    // As a fallback for broken images, we'll still show the card.
+    img.onerror = () => setIsLoaded(true);
+  }, [primaryImageUrl]);
+
+
+  if (!isLoaded) {
+    return <CandleCardSkeleton />;
+  }
 
   return (
-    <div className="relative">
-      {!isLoaded && (
-        <div className="w-full">
-          <CandleCardSkeleton />
-        </div>
-      )}
-      <div className={isLoaded ? 'animate-fadeIn' : 'opacity-0'}>
-        <CandleCard
-            candle={candle}
-            onImageLoad={handleImageLoad}
-        />
-      </div>
-    </div>
+      <CandleCard
+          candle={candle}
+          // The onImageLoad prop is no longer needed here as we handle loading state in this component.
+          // The component will just fade in via CSS animation if needed, or you can add a class.
+          className="animate-fadeIn"
+      />
   );
 }

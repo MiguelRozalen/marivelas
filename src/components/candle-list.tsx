@@ -16,10 +16,11 @@ interface CandleListProps {
   totalCandles: number;
 }
 
-// This skeleton now matches the structure of the updated CandleCardLoader skeleton
+// This skeleton is now simpler, as CandleCardLoader handles its own complex skeleton.
+// This one is just for the initial page load placeholders.
 const PageLoaderSkeleton = () => (
   <Card className="flex flex-col overflow-hidden shadow-lg bg-card h-full">
-      <Skeleton className="h-[300px] w-full" />
+      <Skeleton className="aspect-[4/3] w-full" />
       <CardContent className="p-6 flex-grow space-y-4">
           <Skeleton className="h-6 w-3/4 mb-2" />
           <div className="space-y-2">
@@ -28,13 +29,11 @@ const PageLoaderSkeleton = () => (
                   <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-5 w-5 rounded-full" />
-                  <Skeleton className="h-5 w-5 rounded-full" />
               </div>
           </div>
           <div className="space-y-2">
               <Skeleton className="h-4 w-1/3" />
               <div className="flex flex-wrap gap-3">
-                  <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-5 w-5 rounded-full" />

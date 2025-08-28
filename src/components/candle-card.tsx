@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 
 interface CandleCardProps {
   candle: Candle;
-  onImageLoad?: () => void;
+  onImageLoad?: () => void; // This prop is kept in case it's used elsewhere, but not used by CandleCardLoader anymore.
   className?: string;
 }
 
@@ -59,7 +59,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
         open={isZoomOpen}
         onOpenChange={handleZoomClose}
       />
-      <Card className={cn("flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card", className)}>
+      <Card className={cn("flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card h-full", className)}>
         <CardHeader className="p-0">
           <ImageCarousel
             imageUrls={candle.imageUrls}
@@ -68,7 +68,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             aspectRatio="aspect-[4/3]"
             placeholderDimensions="400x300"
             onImageClick={handleImageClick}
-            onImageLoad={onImageLoad}
+            onImageLoad={onImageLoad} // Pass down the prop
           />
         </CardHeader>
         <CardContent className="p-6 flex-grow">
