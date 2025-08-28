@@ -112,7 +112,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
               <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
               <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Agregar al Carrito
+                Comprar
               </Button>
             </div>
           </CardContent>
