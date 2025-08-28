@@ -66,3 +66,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  :focus-visible {
+    outline: none;
+  }
+}
