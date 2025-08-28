@@ -5,6 +5,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import ImageCarousel from './image-carousel';
 
@@ -33,6 +34,7 @@ export default function ImageZoom({ imageUrls, startIndex, altText, dataAiHint, 
             <DialogContent 
                 className="max-w-[90vw] max-h-[90vh] w-auto h-auto bg-transparent border-none shadow-none flex items-center justify-center p-0"
             >
+                <DialogTitle className="sr-only">{altText}</DialogTitle>
                 <div className="w-[80vw] h-[80vh]">
                      <ImageCarousel
                         key={carouselKey}
