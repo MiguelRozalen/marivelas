@@ -14,8 +14,8 @@ interface CandleCardLoaderProps {
 const CandleCardSkeleton = () => (
     <Card className="flex flex-col overflow-hidden shadow-lg bg-card h-full">
         <Skeleton className="h-[300px] w-full" />
-        <CardContent className="p-6 flex-grow space-y-6">
-            <Skeleton className="h-6 w-3/4" />
+        <CardContent className="p-6 flex-grow space-y-4">
+            <Skeleton className="h-6 w-3/4 mb-2" />
             
             {/* Skeleton for Color Selector */}
             <div className="space-y-2">
