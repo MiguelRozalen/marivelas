@@ -129,7 +129,7 @@ export default function CandleList({ initialCandles, totalCandles }: CandleListP
           </div>
         )}
         {!hasMore && candles.length > 0 && (
-          <p className="text-muted-foreground">Has llegado al final de nuestro catálogo.</p>
+          <p className="text-muted-foreground text-sm italic">Has llegado al final de nuestro catálogo.</p>
         )}
          {candles.length === 0 && !isLoading && (
           <p className="text-muted-foreground text-center col-span-full">No hay velas disponibles en este momento.</p>
