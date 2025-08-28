@@ -20,26 +20,22 @@ const CandleCardSkeleton = () => (
             <Skeleton className="h-6 w-3/4 mb-2" />
             
             <div className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <div className="flex flex-wrap gap-3">
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-5 rounded-full" />
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-7 w-7 rounded-full" />
+                    <Skeleton className="h-3 w-16" />
                 </div>
             </div>
 
             <div className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <div className="flex flex-wrap gap-3">
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-5 rounded-full" />
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-7 w-7 rounded-full" />
+                    <Skeleton className="h-3 w-16" />
                 </div>
             </div>
         </CardContent>
-        <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 border-t mt-auto">
             <Skeleton className="h-8 w-1/4" />
             <Skeleton className="h-10 w-2/5" />
         </CardFooter>

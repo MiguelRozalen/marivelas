@@ -91,7 +91,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                     optionType="color"
                     uniqueIdPrefix={`${candle.id}-color`}
                 />
-                <span className="text-sm font-medium italic" style={colorNameStyle}>{selectedColor.name}</span>
+                <span className="text-xs font-medium italic ml-2" style={colorNameStyle}>{selectedColor.name}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap w-[50px]">
@@ -104,7 +104,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                     optionType="scent"
                     uniqueIdPrefix={`${candle.id}-scent`}
                 />
-                <span className="text-sm font-medium italic" style={scentNameStyle}>{selectedScent.name}</span>
+                <span className="text-xs font-medium italic ml-2" style={scentNameStyle}>{selectedScent.name}</span>
               </div>
             </div>
 
