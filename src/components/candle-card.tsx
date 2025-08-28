@@ -15,10 +15,11 @@ import { ShoppingCart, CheckCircle } from 'lucide-react';
 import ImageCarousel from './image-carousel';
 import ImageZoom from './image-zoom';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CandleCardProps {
   candle: Candle;
-  onImageLoad?: () => void; // This prop is kept in case it's used elsewhere, but not used by CandleCardLoader anymore.
+  onImageLoad?: () => void;
   className?: string;
 }
 
@@ -50,7 +51,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
   }
 
   return (
-    <>
+    <TooltipProvider>
       <ImageZoom 
         imageUrls={candle.imageUrls}
         startIndex={zoomStartIndex}
@@ -68,7 +69,7 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
             aspectRatio="aspect-[4/3]"
             placeholderDimensions="400x300"
             onImageClick={handleImageClick}
-            onImageLoad={onImageLoad} // Pass down the prop
+            onImageLoad={onImageLoad}
           />
         </CardHeader>
         <CardContent className="p-6 flex-grow">
@@ -76,7 +77,9 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
           
           <div className="mt-4 space-y-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2 block">Selecciona un color:</Label>
+              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Color: <span className="font-semibold text-card-foreground">{selectedColor.name}</span>
+              </Label>
               <RadioGroup
                 value={selectedColor.value}
                 onValueChange={(value) => {
@@ -87,28 +90,36 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                 aria-label={`Opciones de color para ${candle.name}`}
               >
                 {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
-                  <div key={colorOpt.value} className="flex items-center">
-                    <RadioGroupItem 
-                      value={colorOpt.value} 
-                      id={`${candle.id}-color-${colorOpt.value}`} 
-                      className="sr-only peer"
-                      aria-label={colorOpt.name}
-                    />
-                    <Label 
-                      htmlFor={`${candle.id}-color-${colorOpt.value}`} 
-                      className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
-                                 peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
-                                 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
-                      style={{ backgroundColor: colorOpt.hexColor }}
-                      title={colorOpt.name}
-                    >
-                    </Label>
-                  </div>
+                  <Tooltip key={colorOpt.value}>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        <RadioGroupItem 
+                          value={colorOpt.value} 
+                          id={`${candle.id}-color-${colorOpt.value}`} 
+                          className="sr-only peer"
+                          aria-label={colorOpt.name}
+                        />
+                        <Label 
+                          htmlFor={`${candle.id}-color-${colorOpt.value}`} 
+                          className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
+                                     peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
+                                     peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
+                          style={{ backgroundColor: colorOpt.hexColor }}
+                        >
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{colorOpt.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </RadioGroup>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2 block">Selecciona un aroma:</Label>
+               <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Aroma: <span className="font-semibold text-card-foreground">{selectedScent.name}</span>
+              </Label>
               <RadioGroup
                 value={selectedScent.value}
                 onValueChange={(value) => {
@@ -119,23 +130,29 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
                 aria-label={`Opciones de aroma para ${candle.name}`}
               >
                 {AVAILABLE_CANDLE_SCENTS.map((scentOpt: CandleScentOption) => (
-                  <div key={scentOpt.value} className="flex items-center">
-                    <RadioGroupItem 
-                      value={scentOpt.value} 
-                      id={`${candle.id}-scent-${scentOpt.value}`} 
-                      className="sr-only peer"
-                      aria-label={scentOpt.name}
-                    />
-                    <Label 
-                      htmlFor={`${candle.id}-scent-${scentOpt.value}`} 
-                      className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
-                                 peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
-                                 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
-                      style={{ backgroundColor: scentOpt.hexColor }}
-                      title={scentOpt.name}
-                    >
-                    </Label>
-                  </div>
+                  <Tooltip key={scentOpt.value}>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        <RadioGroupItem 
+                          value={scentOpt.value} 
+                          id={`${candle.id}-scent-${scentOpt.value}`} 
+                          className="sr-only peer"
+                          aria-label={scentOpt.name}
+                        />
+                        <Label 
+                          htmlFor={`${candle.id}-scent-${scentOpt.value}`} 
+                          className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
+                                     peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
+                                     peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
+                          style={{ backgroundColor: scentOpt.hexColor }}
+                        >
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{scentOpt.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </RadioGroup>
             </div>
@@ -149,6 +166,6 @@ export default function CandleCard({ candle, onImageLoad, className }: CandleCar
           </Button>
         </CardFooter>
       </Card>
-    </>
+    </TooltipProvider>
   );
 }
