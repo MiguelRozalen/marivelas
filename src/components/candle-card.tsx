@@ -12,7 +12,8 @@ import { useState, useContext } from 'react';
 import { CartContext } from '@/context/cart-context';
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, CheckCircle } from 'lucide-react';
-import ImageCarousel from './image-carousel'; // Import the new carousel component
+import ImageCarousel from './image-carousel';
+import ImageZoom from './image-zoom'; // Import the new zoom component
 
 interface CandleCardProps {
   candle: Candle;
@@ -20,6 +21,9 @@ interface CandleCardProps {
 
 export default function CandleCard({ candle }: CandleCardProps) {
   const [selectedColor, setSelectedColor] = useState<CandleColorOption>(AVAILABLE_CANDLE_COLORS[0]);
+  const [zoomedImageUrl, setZoomedImageUrl] = useState<string | null>(null);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+
   const { addToCart } = useContext(CartContext);
   const { toast } = useToast();
 
@@ -32,62 +36,81 @@ export default function CandleCard({ candle }: CandleCardProps) {
     });
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setZoomedImageUrl(imageUrl);
+    setIsZoomOpen(true);
+  };
+  
+  const handleZoomClose = () => {
+    setIsZoomOpen(false);
+    // Optional: delay clearing the image to prevent flicker during closing animation
+    setTimeout(() => setZoomedImageUrl(null), 300);
+  }
+
   return (
-    <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
-      <CardHeader className="p-0">
-        {/* Replace NextImage with ImageCarousel */}
-        <ImageCarousel
-          imageUrls={candle.imageUrls}
-          altText={candle.name}
-          dataAiHint={candle.dataAiHint}
-          aspectRatio="aspect-[4/3]"
-          placeholderDimensions="400x300"
-        />
-      </CardHeader>
-      <CardContent className="p-6 flex-grow">
-        <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
-        {candle.description && <CardDescription className="text-muted-foreground mb-4 text-sm">{candle.description}</CardDescription>}
-        
-        <div className="mt-4">
-          <Label className="text-sm font-medium text-muted-foreground mb-2 block">Selecciona un color:</Label>
-          <RadioGroup
-            value={selectedColor.value}
-            onValueChange={(value) => {
-              const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
-              if (color) setSelectedColor(color);
-            }}
-            className="flex flex-wrap gap-3"
-            aria-label={`Opciones de color para ${candle.name}`}
-          >
-            {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
-              <div key={colorOpt.value} className="flex items-center">
-                <RadioGroupItem 
-                  value={colorOpt.value} 
-                  id={`${candle.id}-${colorOpt.value}`} 
-                  className="sr-only peer"
-                  aria-label={colorOpt.name}
-                />
-                <Label 
-                  htmlFor={`${candle.id}-${colorOpt.value}`} 
-                  className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
-                             peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
-                             peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
-                  style={{ backgroundColor: colorOpt.hexColor }}
-                  title={colorOpt.name}
-                >
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-      </CardContent>
-      <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
-        <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
-          <ShoppingCart className="mr-2 h-5 w-5" />
-          Agregar al Carrito
-        </Button>
-      </CardFooter>
-    </Card>
+    <>
+      <ImageZoom 
+        imageUrl={zoomedImageUrl}
+        altText={`Zoom de ${candle.name}`}
+        open={isZoomOpen}
+        onOpenChange={handleZoomClose}
+      />
+      <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card animate-fadeIn">
+        <CardHeader className="p-0">
+          <ImageCarousel
+            imageUrls={candle.imageUrls}
+            altText={candle.name}
+            dataAiHint={candle.dataAiHint}
+            aspectRatio="aspect-[4/3]"
+            placeholderDimensions="400x300"
+            onImageClick={handleImageClick} // Pass the handler
+          />
+        </CardHeader>
+        <CardContent className="p-6 flex-grow">
+          <CardTitle className="text-xl font-semibold mb-2 text-card-foreground">{candle.name}</CardTitle>
+          {candle.description && <CardDescription className="text-muted-foreground mb-4 text-sm">{candle.description}</CardDescription>}
+          
+          <div className="mt-4">
+            <Label className="text-sm font-medium text-muted-foreground mb-2 block">Selecciona un color:</Label>
+            <RadioGroup
+              value={selectedColor.value}
+              onValueChange={(value) => {
+                const color = AVAILABLE_CANDLE_COLORS.find(c => c.value === value);
+                if (color) setSelectedColor(color);
+              }}
+              className="flex flex-wrap gap-3"
+              aria-label={`Opciones de color para ${candle.name}`}
+            >
+              {AVAILABLE_CANDLE_COLORS.map((colorOpt: CandleColorOption) => (
+                <div key={colorOpt.value} className="flex items-center">
+                  <RadioGroupItem 
+                    value={colorOpt.value} 
+                    id={`${candle.id}-${colorOpt.value}`} 
+                    className="sr-only peer"
+                    aria-label={colorOpt.name}
+                  />
+                  <Label 
+                    htmlFor={`${candle.id}-${colorOpt.value}`} 
+                    className="h-5 w-5 rounded-full border-2 border-transparent cursor-pointer transition-all
+                               peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-ring peer-data-[state=checked]:ring-offset-2 
+                               peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1"
+                    style={{ backgroundColor: colorOpt.hexColor }}
+                    title={colorOpt.name}
+                  >
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        </CardContent>
+        <CardFooter className="p-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-2xl font-bold text-primary">€{candle.price.toFixed(2)}</p>
+          <Button onClick={handleAddToCart} variant="default" className="w-full sm:w-auto">
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            Agregar al Carrito
+          </Button>
+        </CardFooter>
+      </Card>
+    </>
   );
 }

@@ -20,8 +20,9 @@ interface ImageCarouselProps {
   altText: string;
   dataAiHint?: string;
   aspectRatio?: "aspect-video" | "aspect-square" | "aspect-[4/3]" | "aspect-[3/4]" | "aspect-[16/9]";
-  placeholderBaseUrl?: string; // e.g., "https://placehold.co/"
-  placeholderDimensions?: string; // e.g., "400x300" or "96x96"
+  placeholderBaseUrl?: string;
+  placeholderDimensions?: string;
+  onImageClick?: (imageUrl: string) => void; // New prop for click handler
 }
 
 const DEFAULT_PLACEHOLDER_URL = "https://placehold.co/400x300.png";
@@ -32,9 +33,10 @@ interface CarouselImageItemProps {
   dataAiHint?: string;
   placeholderUrl: string;
   index: number;
+  onClick?: (imageUrl: string) => void;
 }
 
-function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index }: CarouselImageItemProps) {
+function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onClick }: CarouselImageItemProps) {
   const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageKey, setImageKey] = useState(0);
@@ -63,7 +65,10 @@ function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index }: 
   };
   
   return (
-    <div className="relative w-full h-full bg-muted/50">
+    <div 
+      className={cn("relative w-full h-full bg-muted/50", onClick && "cursor-pointer")}
+      onClick={() => onClick?.(effectiveImageUrl)}
+    >
       {isImageLoading && (
         <Skeleton className="absolute inset-0 h-full w-full" />
       )}
@@ -93,13 +98,17 @@ export default function ImageCarousel({
   dataAiHint, 
   aspectRatio = "aspect-[4/3]",
   placeholderBaseUrl = "https://placehold.co/",
-  placeholderDimensions = "400x300"
+  placeholderDimensions = "400x300",
+  onImageClick // Destructure new prop
 }: ImageCarouselProps) {
   const fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
 
   if (!imageUrls || imageUrls.length === 0) {
     return (
-        <div className={cn("w-full bg-muted/50", aspectRatio)}>
+        <div 
+          className={cn("w-full bg-muted/50", aspectRatio, onImageClick && "cursor-pointer")}
+          onClick={() => onImageClick?.(fallbackPlaceholder)}
+        >
             <NextImage src={fallbackPlaceholder} alt={altText} fill className="object-cover" data-ai-hint={dataAiHint} />
         </div>
     );
@@ -122,6 +131,7 @@ export default function ImageCarousel({
                 dataAiHint={dataAiHint}
                 placeholderUrl={fallbackPlaceholder}
                 index={index}
+                onClick={onImageClick} // Pass handler to item
               />
             </CarouselItem>
           ))}
@@ -133,13 +143,6 @@ export default function ImageCarousel({
           </>
         )}
       </Carousel>
-      {/* Removed image count indicator
-      {imageUrls.length > 1 && (
-        <div className="py-2 text-center text-sm text-muted-foreground">
-          {current} / {count}
-        </div>
-      )}
-      */}
     </div>
   );
 }
