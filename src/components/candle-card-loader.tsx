@@ -42,9 +42,14 @@ const CandleCardSkeleton = () => (
     </Card>
 );
 
+
 export default function CandleCardLoader({ candle }: CandleCardLoaderProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const primaryImageUrl = candle.imageUrls?.[0] || '/placeholder.png';
+  // Usa el basePath público para rutas locales
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const rawImageUrl = candle.imageUrls?.[0] || '/placeholder.png';
+  // Si la URL es absoluta (http/https), no le agregues basePath
+  const primaryImageUrl = rawImageUrl.startsWith('http') ? rawImageUrl : basePath + rawImageUrl;
 
   useEffect(() => {
     // This effect preloads the image.

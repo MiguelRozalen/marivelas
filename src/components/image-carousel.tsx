@@ -40,27 +40,30 @@ interface CarouselImageItemProps {
 }
 
 function CarouselImageItem({ src, altText, dataAiHint, placeholderUrl, index, onLoad, onError, objectFit = 'cover', aspectRatio }: CarouselImageItemProps) {
-  const [effectiveImageUrl, setEffectiveImageUrl] = useState(src);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  // Si la URL es absoluta, no le agregues basePath
+  const getFullUrl = (url: string) => url.startsWith('http') ? url : basePath + url;
+  const [effectiveImageUrl, setEffectiveImageUrl] = useState(getFullUrl(src));
   const [isImageLoading, setIsImageLoading] = useState(true);
 
   useEffect(() => {
-    setEffectiveImageUrl(src);
+    setEffectiveImageUrl(getFullUrl(src));
     setIsImageLoading(true);
   }, [src]);
   
   const handleLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
     setIsImageLoading(false);
     const imgElement = event.currentTarget;
-    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== placeholderUrl) {
-      setEffectiveImageUrl(placeholderUrl);
+    if (imgElement.naturalWidth === 0 && effectiveImageUrl !== getFullUrl(placeholderUrl)) {
+      setEffectiveImageUrl(getFullUrl(placeholderUrl));
     }
     onLoad?.();
   };
 
   const handleError = () => {
     setIsImageLoading(false);
-    if (effectiveImageUrl !== placeholderUrl) {
-      setEffectiveImageUrl(placeholderUrl);
+    if (effectiveImageUrl !== getFullUrl(placeholderUrl)) {
+      setEffectiveImageUrl(getFullUrl(placeholderUrl));
     }
     onError?.();
   };
@@ -107,7 +110,12 @@ export default function ImageCarousel({
   initialIndex = 0,
   objectFit = 'cover',
 }: ImageCarouselProps) {
-  const fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
+  // Si el placeholder es local, anteponer basePath
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  let fallbackPlaceholder = `${placeholderBaseUrl}${placeholderDimensions}.png`;
+  if (!fallbackPlaceholder.startsWith('http')) {
+    fallbackPlaceholder = basePath + fallbackPlaceholder;
+  }
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>, index?: number) => {
     if (!onImageClick) return;

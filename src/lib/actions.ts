@@ -1,6 +1,6 @@
 
 // src/lib/actions.ts
-"use server";
+// "use server"; // Comentado para desactivar Server Actions por incompatibilidad con static export
 
 import type { Candle } from "@/types"; 
 import { PAGE_SIZE } from "@/config/pagination";

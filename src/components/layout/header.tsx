@@ -24,14 +24,20 @@ export default function Header() {
     <header className="bg-card shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center group">
-          <Image
-            src="/logo.svg"
-            alt="Marivelas Logo"
-            width={30}
-            height={30}
-            className="h-auto mr-2"
-            priority
-          />
+          {(() => {
+            const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+            const logoSrc = basePath + '/logo.svg';
+            return (
+              <Image
+                src={logoSrc}
+                alt="Marivelas Logo"
+                width={30}
+                height={30}
+                className="h-auto mr-2"
+                priority
+              />
+            );
+          })()}
           <span className="text-2xl text-primary font-bold">
             Marivelas
           </span>
