@@ -11,11 +11,11 @@
     { "name": "Rosa Pastel", "value": "rosa-pastel-fuerte", "hexColor": "#FFD1DC" }
   ],
   "availableScents": [
-    { "name": "Vainilla", "value": "vainilla", "hexColor": "#f3e5ab" },
-    { "name": "Lavanda", "value": "lavanda", "hexColor": "#e6e6fa" },
+    { "name": "Toffe", "value": "toffe", "hexColor": "#f3e5ab" },
     { "name": "Canela", "value": "canela", "hexColor": "#d2691e" },
     { "name": "Frutos Rojos", "value": "frutos-rojos", "hexColor": "#dc143c" },
-    { "name": "Jazmín", "value": "jazmin", "hexColor": "#f8f8ff" },
+    { "name": "Leña", "value": "leña", "hexColor": "#1f2937" },
+    { "name": "Tropical", "value": "tropical", "hexColor": "#bbf7d0" },
     { "name": "Sin Aroma", "value": "sin-aroma", "hexColor": "#f5f5f5" }
   ],
   "candles": [
@@ -29,7 +29,7 @@
     { "id": "8", "name": "Gatuno", "price": 9.00, "imageUrls": ["/images/candles/gatuno_1.jpeg", "/images/candles/gatuno_2.jpeg"], "dataAiHint": "coconut palm", "description": "Dulce coco tropical con un toque de vainilla." },
     { "id": "9", "name": "Momentos", "price": 7.00, "imageUrls": ["/images/candles/camara_1.jpg","/images/candles/camara_2.jpeg","/images/candles/camara_3.jpeg"], "dataAiHint": "jasmine flower", "description": "Embriagador aroma de jazmín floreciendo en la noche." },
     { "id": "10", "name": "Baddy", "price": 9.00, "imageUrls": ["/images/candles/baddy.jpeg"], "dataAiHint":"apple cinnamon", "description": "Cálida mezcla de manzana horneada y canela especiada." },
-    { "id": "11", "name": "Desdentao", "price": 10.00, "imageUrls": ["/images/candles/desdentao_2.jpeg","/images/candles/desdentao_1.jpeg"], "dataAiHint": "white tea", "description": "Sofisticada infusión de té blanco con un toque de jengibre." },
+    { "id": "11", "name": "Desdentao", "price": 8.00, "imageUrls": ["/images/candles/desdentao_2.jpeg","/images/candles/desdentao_1.jpeg"], "dataAiHint": "white tea", "description": "Sofisticada infusión de té blanco con un toque de jengibre." },
     { "id": "12", "name": "Mundo en tus Manos", "price": 10.00, "imageUrls":["/images/candles/mundo_1.jpg","/images/candles/mundo_2.jpg"], "dataAiHint": "coffee beans", "description": "Aroma estimulante de granos de café recién tostados." },
     { "id": "13", "name": "Body Mujer", "price": 10.50, "imageUrls": ["/images/candles/body_1.jpg","/images/candles/body_2.jpg","/images/candles/body_3.jpg"], "dataAiHint": "mint leaves", "description": "Fragancia pura y vigorizante de hojas de menta fresca." },
     { "id": "14", "name": "Namaste", "price": 5.50, "imageUrls": ["/images/candles/namaste_1.jpeg","/images/candles/namaste_2.jpeg","/images/candles/namaste_3.jpeg"], "dataAiHint": "fig fruit", "description": "Dulce y terroso aroma de higos maduros del Mediterráneo." },
